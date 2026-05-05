@@ -8,6 +8,7 @@
     android:layout_height="match_parent"
     android:paddingTop="40dp"
     android:background="@drawable/instabg"
+    tools:context="RegisterActivity"
     >
 
     <TextView
@@ -46,7 +47,7 @@
 
     <!-- Username Field -->
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/usernameLayout"
+        android:id="@+id/emailLayout"
         android:layout_width="320dp"
         android:layout_height="wrap_content"
         android:hint="@string/username_email"
@@ -57,10 +58,10 @@
         android:layout_marginTop="16dp">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/username"
+            android:id="@+id/email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="text"
+            android:inputType="textEmailAddress"
             android:textColor="@color/material_dynamic_neutral50"
             android:textSize="20sp"/>
     </com.google.android.material.textfield.TextInputLayout>
@@ -72,7 +73,7 @@
         android:layout_height="wrap_content"
         android:hint="@string/password"
         app:boxBackgroundMode="filled"
-        app:layout_constraintTop_toBottomOf="@id/usernameLayout"
+        app:layout_constraintTop_toBottomOf="@id/emailLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp">

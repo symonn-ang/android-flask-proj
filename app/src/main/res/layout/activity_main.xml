@@ -38,10 +38,10 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:background="#90ffffff"
-            android:id="@+id/username"
+            android:id="@+id/email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="text"
+            android:inputType="textEmailAddress"
             android:textColor="@color/material_dynamic_neutral50"
             android:textSize="20sp"
             android:drawableStart="@drawable/baseline_email_24"
