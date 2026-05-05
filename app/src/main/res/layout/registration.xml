@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="40dp"
+    android:background="@drawable/instabg"
+    >
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/kaushan_script"
+        android:text="@string/registration"
+        android:textColor="@color/white"
+        android:textSize="60sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="80dp"
+        android:layout_marginBottom="50dp"/>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/nameLayout"
+        android:layout_width="320dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/username"
+        app:boxBackgroundMode="filled"
+        app:layout_constraintTop_toBottomOf="@id/title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="70dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:textColor="@color/material_dynamic_neutral50"
+            android:textSize="20sp"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Username Field -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/usernameLayout"
+        android:layout_width="320dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/username_email"
+        app:boxBackgroundMode="filled"
+        app:layout_constraintTop_toBottomOf="@id/nameLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:textColor="@color/material_dynamic_neutral50"
+            android:textSize="20sp"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Password Field -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/passwordLayout"
+        android:layout_width="320dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/password"
+        app:boxBackgroundMode="filled"
+        app:layout_constraintTop_toBottomOf="@id/usernameLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:textColor="@color/material_dynamic_neutral50"
+            android:textSize="20sp"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Register Button -->
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    <Button
+        android:id="@+id/registerBtn"
+        android:layout_width="244dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="24dp"
+        android:text="@string/register"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        app:backgroundTint="@android:color/holo_blue_dark"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/passwordLayout" />
+
+    <!--    <TextView-->
+    <!--        android:id="@+id/orText"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:text="@string/or"-->
+    <!--        android:textColor="@android:color/white"-->
+    <!--        android:textSize="20sp"-->
+    <!--        app:layout_constraintTop_toBottomOf="@id/registerBtn"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        android:layout_marginTop="28dp" />-->
+
+    <!--    <ImageView-->
+    <!--        android:id="@+id/fbIcon"-->
+    <!--        android:layout_width="40dp"-->
+    <!--        android:layout_height="40dp"-->
+    <!--        app:srcCompat="@drawable/instafb"-->
+    <!--        app:layout_constraintTop_toBottomOf="@id/orText"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        android:layout_marginTop="20dp"-->
+    <!--        android:layout_marginStart="60dp" />-->
+
+    <!--    <TextView-->
+    <!--        android:id="@+id/fbText"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:text="@string/log_in_with_facebook"-->
+    <!--        android:textSize="20sp"-->
+    <!--        android:textColor="@android:color/white"-->
+    <!--        app:layout_constraintTop_toTopOf="@id/fbIcon"-->
+    <!--        app:layout_constraintBottom_toBottomOf="@id/fbIcon"-->
+    <!--        app:layout_constraintStart_toEndOf="@id/fbIcon"-->
+    <!--        android:layout_marginStart="12dp" />-->
+
+    <Button
+        android:id="@+id/backBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/back_to_homepage"
+        android:textSize="20sp"
+        app:backgroundTint="@android:color/holo_blue_dark"
+        app:layout_constraintTop_toBottomOf="@id/registerBtn"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="170dp"
+        android:layout_marginStart="40dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

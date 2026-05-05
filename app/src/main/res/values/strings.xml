@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">test1</string>
+    <string name="messager">messager</string>
+    <string name="username_email">Email Address…</string>
+    <string name="password">Password…</string>
+    <string name="login">Login</string>
+    <string name="don_t_have_an_account">Don\'t have an account?</string>
+    <string name="register_here">register_here</string>
+    <string name="registration">Registration</string>
+    <string name="username">Username</string>
+    <string name="register">Register</string>
+    <string name="back_to_homepage">Back to homepage</string>
+</resources>
