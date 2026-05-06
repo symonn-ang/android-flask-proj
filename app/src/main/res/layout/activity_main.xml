@@ -6,8 +6,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="40dp"
     android:background="@drawable/instabg"
+    android:fitsSystemWindows="true"
     tools:context=".MainActivity">
 
     <TextView
@@ -23,21 +23,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Username -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/usernameLayout"
         android:layout_width="320dp"
         android:layout_height="wrap_content"
         android:hint="@string/username_email"
-        android:background="#30ffffff"
         app:boxBackgroundMode="filled"
         app:layout_constraintTop_toBottomOf="@id/title"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="70dp">
+        android:layout_marginTop="60dp">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:background="#90ffffff"
             android:id="@+id/email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -45,11 +42,9 @@
             android:textColor="@color/material_dynamic_neutral50"
             android:textSize="20sp"
             android:drawableStart="@drawable/baseline_email_24"
-            android:drawablePadding="20dp"
-            />
+            android:drawablePadding="20dp" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Password -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/passwordLayout"
         android:layout_width="320dp"
@@ -64,7 +59,6 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/password"
             android:layout_width="match_parent"
-            android:background="#90ffffff"
             android:layout_height="wrap_content"
             android:inputType="textPassword"
             android:textColor="@color/material_dynamic_neutral50"
@@ -73,14 +67,6 @@
             android:drawablePadding="20dp"/>
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Register Button -->
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:visibility="gone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
     <Button
         android:id="@+id/loginBtn"
         android:layout_width="244dp"
@@ -92,9 +78,7 @@
         app:layout_constraintTop_toBottomOf="@id/passwordLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="24dp" />
-
-
+        android:layout_marginTop="40dp" />
 
     <TextView
         android:id="@+id/noAcc"
@@ -105,8 +89,8 @@
         android:textSize="20sp"
         app:layout_constraintTop_toBottomOf="@id/loginBtn"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="180dp"
-        android:layout_marginStart="40dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="48dp" />
 
     <Button
         android:id="@+id/registerBtn"
@@ -117,7 +101,17 @@
         app:backgroundTint="@android:color/holo_blue_dark"
         app:layout_constraintTop_toBottomOf="@id/noAcc"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="12dp"
-        android:layout_marginStart="40dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="12dp" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="300dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
