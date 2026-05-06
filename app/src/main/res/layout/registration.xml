@@ -40,7 +40,9 @@
             android:layout_height="wrap_content"
             android:inputType="text"
             android:textColor="@color/material_dynamic_neutral50"
-            android:textSize="20sp"/>
+            android:textSize="20sp"
+            android:drawableStart="@drawable/outline_accessibility_new_24"
+            android:drawablePadding="20dp"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -60,7 +62,9 @@
             android:layout_height="wrap_content"
             android:inputType="textEmailAddress"
             android:textColor="@color/material_dynamic_neutral50"
-            android:textSize="20sp"/>
+            android:textSize="20sp"
+            android:drawableStart="@drawable/baseline_email_24"
+            android:drawablePadding="20dp"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -80,7 +84,9 @@
             android:layout_height="wrap_content"
             android:inputType="textPassword"
             android:textColor="@color/material_dynamic_neutral50"
-            android:textSize="20sp"/>
+            android:textSize="20sp"
+            android:drawableStart="@drawable/outline_asterisk_24"
+            android:drawablePadding="20dp"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button

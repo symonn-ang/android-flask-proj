@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="80dp"
         android:fontFamily="@font/kaushan_script"
-        android:text="@string/messager"
+        android:text="@string/title"
         android:textColor="@color/white"
         android:textSize="70sp"
         app:layout_constraintEnd_toEndOf="parent"

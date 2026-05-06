@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">test1</string>
-    <string name="messager">messager</string>
+    <string name="title">Twooter</string>
     <string name="username_email">Email Address…</string>
     <string name="password">Password…</string>
     <string name="login">Login</string>
