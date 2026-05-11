@@ -10,4 +10,6 @@
     <string name="username">Username</string>
     <string name="register">Register</string>
     <string name="back_to_homepage">Back to homepage</string>
+    <string name="welcome">Welcome</string>
+    <string name="logout">Logout</string>
 </resources>

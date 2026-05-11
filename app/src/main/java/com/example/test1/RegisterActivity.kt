@@ -5,30 +5,36 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+// for flask vvv
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import org.json.JSONObject
 import java.io.IOException
-
+// for flask ^^^
 class RegisterActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.registration)
 
-        val name = findViewById<EditText>(R.id.name)
+        val username = findViewById<EditText>(R.id.name)
         val email = findViewById<EditText>(R.id.email)
         val password = findViewById<EditText>(R.id.password)
         val registerBtn = findViewById<Button>(R.id.registerBtn)
         val backBtn = findViewById<Button>(R.id.backBtn)
 
         registerBtn.setOnClickListener {
-            val nameText = name.text.toString().trim()
+            val nameText = username.text.toString().trim()
             val emailText = email.text.toString().trim()
             val passText = password.text.toString().trim()
 
             if (nameText.isEmpty() || emailText.isEmpty() || passText.isEmpty()) {
-                Toast.makeText(this, "All fields are required!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Please answer all fields", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (passText.length < 6) {
+                Toast.makeText(this, "Please enter 6 or more characters", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -41,11 +47,11 @@ class RegisterActivity : AppCompatActivity() {
 
     }
 
-    private fun registerUser(name: String, email: String, password: String) {
+    private fun registerUser(username: String, email: String, password: String) {
         val client = OkHttpClient()
 
         val json = JSONObject()
-        json.put("name", name)
+        json.put("username", username)
         json.put("email", email)
         json.put("password", password)
 
@@ -55,8 +61,8 @@ class RegisterActivity : AppCompatActivity() {
         )
 
         val request = Request.Builder()
-            .url("http://10.0.2.2:5000/register")
-//            .url("http://192.168.1.9:5000/register") // CHANGE THIS sa ipconfig <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+//            .url("http://10.0.2.2:5000/register")
+            .url("http://192.168.1.25:5000/register") // CHANGE THIS sa ipconfig <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             .post(body)
             .build()
 
