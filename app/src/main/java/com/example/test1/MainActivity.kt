@@ -8,6 +8,9 @@ import androidx.core.view.WindowInsetsCompat
 import android.content.Intent
 import android.widget.Button
 import android.widget.Toast
+import android.graphics.LinearGradient
+import android.graphics.Shader
+import android.widget.TextView
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import org.json.JSONObject
@@ -18,6 +21,8 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
+        val textView: TextView = findViewById(R.id.title)
+
         val loginBtn = findViewById<Button>(R.id.loginBtn)
         val email = findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.email)
         val password = findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.password)
@@ -26,6 +31,29 @@ class MainActivity : AppCompatActivity() {
         registerBtn.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
+        }
+
+        textView.setTextColor(android.graphics.Color.WHITE)
+
+        textView.post {
+            val paint = textView.paint
+            val height = textView.height.toFloat()
+
+            val textWidth = paint.measureText(textView.text.toString())
+
+            val gradient = LinearGradient(
+                0f, 0f,
+                0f, height,
+                intArrayOf(
+                    android.graphics.Color.WHITE,
+                    android.graphics.Color.parseColor("#2196F3")
+                ),
+                floatArrayOf(0.0f, 0.7f),
+                Shader.TileMode.CLAMP
+            )
+
+            paint.shader = gradient
+            textView.invalidate()
         }
 
         loginBtn.setOnClickListener {
@@ -49,7 +77,8 @@ class MainActivity : AppCompatActivity() {
             )
 
             val request = Request.Builder()
-                .url("http://192.168.1.25:5000/login")
+                .url("http://10.0.2.2:5000/login")
+//                .url("http://192.168.1.25:5000/login")
                 .post(body)
                 .build()
 

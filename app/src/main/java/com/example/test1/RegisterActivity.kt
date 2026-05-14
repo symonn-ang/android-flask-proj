@@ -61,8 +61,8 @@ class RegisterActivity : AppCompatActivity() {
         )
 
         val request = Request.Builder()
-//            .url("http://10.0.2.2:5000/register")
-            .url("http://192.168.1.25:5000/register") // CHANGE THIS sa ipconfig <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            .url("http://10.0.2.2:5000/register")
+//            .url("http://192.168.1.25:5000/register") // CHANGE THIS sa ipconfig <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             .post(body)
             .build()
 
