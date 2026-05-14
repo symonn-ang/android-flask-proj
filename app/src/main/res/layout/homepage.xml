@@ -13,10 +13,13 @@
         android:id="@+id/icon"
         android:layout_width="130sp"
         android:layout_height="130sp"
-        android:src="@drawable/person"
+        android:layout_marginTop="56dp"
 
-        tools:layout_editor_absoluteX="153dp"
-        tools:layout_editor_absoluteY="210dp" />
+        android:src="@drawable/person"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title" />
 
     <TextView
         android:id="@+id/title"
@@ -36,15 +39,15 @@
         android:id="@+id/label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="96dp"
-        android:layout_marginEnd="72dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="92dp"
         android:fontFamily="@font/kaushan_script"
         android:text="Todays Twoot~"
         android:textColor="@color/white"
 
         android:textSize="40sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/icon"/>
+        app:layout_constraintTop_toBottomOf="@id/icon" />
 
     <Button
         android:id="@+id/logoutBtn"
