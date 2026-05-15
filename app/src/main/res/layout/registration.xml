@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:scrollbars="vertical">
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:background="@color/bg_gray"
     android:fitsSystemWindows="true"
     tools:context="RegisterActivity">
@@ -89,6 +95,28 @@
             android:drawablePadding="20dp"/>
     </com.google.android.material.textfield.TextInputLayout>
 
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/checkPasswordLayout"
+        android:layout_width="320dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/confirm_password"
+        app:boxBackgroundMode="filled"
+        app:layout_constraintTop_toBottomOf="@id/passwordLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/checkPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:textColor="@color/material_dynamic_neutral50"
+            android:textSize="20sp"
+            android:drawableStart="@drawable/outline_asterisk_24"
+            android:drawablePadding="20dp"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
     <Button
         android:id="@+id/registerBtn"
         android:layout_width="244dp"
@@ -97,7 +125,7 @@
         android:textColor="@android:color/white"
         android:textSize="20sp"
         app:backgroundTint="@android:color/holo_blue_dark"
-        app:layout_constraintTop_toBottomOf="@id/passwordLayout"
+        app:layout_constraintTop_toBottomOf="@id/checkPasswordLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="40dp" />
@@ -124,4 +152,14 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="300dp"/>
 
+    <View
+        android:id="@+id/forScrolling"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        app:layout_constraintTop_toBottomOf="@id/backBtn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

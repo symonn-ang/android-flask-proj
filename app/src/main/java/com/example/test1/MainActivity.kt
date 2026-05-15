@@ -15,6 +15,8 @@ import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import org.json.JSONObject
 import java.io.IOException
+import androidx.core.graphics.toColorInt
+
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,11 +24,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val textView: TextView = findViewById(R.id.title)
+        val textView2: TextView = findViewById(R.id.subTitle)
 
         val loginBtn = findViewById<Button>(R.id.loginBtn)
         val email = findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.email)
         val password = findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.password)
-        val registerBtn = findViewById<Button>(R.id.registerBtn)
+        val registerBtn = findViewById<TextView>(R.id.registerBtn)
 
         registerBtn.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
@@ -34,26 +37,48 @@ class MainActivity : AppCompatActivity() {
         }
 
         textView.setTextColor(android.graphics.Color.WHITE)
+        textView2.setTextColor(android.graphics.Color.WHITE)
 
         textView.post {
             val paint = textView.paint
             val height = textView.height.toFloat()
 
-            val textWidth = paint.measureText(textView.text.toString())
+            val textWidth = paint.measureText(textView.text.toString()) // ya idk
 
             val gradient = LinearGradient(
                 0f, 0f,
                 0f, height,
                 intArrayOf(
                     android.graphics.Color.WHITE,
-                    android.graphics.Color.parseColor("#2196F3")
+                    "#2196F3".toColorInt()
                 ),
-                floatArrayOf(0.0f, 0.7f),
+                floatArrayOf(0.0f, 0.3f),
                 Shader.TileMode.CLAMP
             )
 
             paint.shader = gradient
             textView.invalidate()
+        }
+
+        textView2.post {
+            val paint = textView2.paint
+            val height = textView2.height.toFloat()
+
+            val textWidth = paint.measureText(textView2.text.toString()) // ya idk
+
+            val gradient = LinearGradient(
+                0f, 0f,
+                0f, height,
+                intArrayOf(
+                    android.graphics.Color.WHITE,
+                    "#2196F3".toColorInt()
+                ),
+                floatArrayOf(0.4f, 100f),
+                Shader.TileMode.CLAMP
+            )
+
+            paint.shader = gradient
+            textView2.invalidate()
         }
 
         loginBtn.setOnClickListener {
@@ -62,6 +87,7 @@ class MainActivity : AppCompatActivity() {
             val passText = password.text.toString().trim()
 
             if (emailText.isEmpty() || passText.isEmpty()) {
+                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -77,8 +103,10 @@ class MainActivity : AppCompatActivity() {
             )
 
             val request = Request.Builder()
-                .url("http://10.0.2.2:5000/login")
+//                .url("http://10.0.2.2:5000/login")
 //                .url("http://192.168.1.25:5000/login")
+                .url("http://192.168.1.7:5000/login")
+
                 .post(body)
                 .build()
 
