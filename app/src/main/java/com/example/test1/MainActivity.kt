@@ -104,8 +104,8 @@ class MainActivity : AppCompatActivity() {
 
             val request = Request.Builder()
 //                .url("http://10.0.2.2:5000/login")
-//                .url("http://192.168.1.25:5000/login")
-                .url("http://192.168.1.7:5000/login")
+                .url("http://192.168.1.25:5000/login")
+//                .url("http://192.168.1.7:5000/login")
 
                 .post(body)
                 .build()
@@ -119,12 +119,32 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun onResponse(call: Call, response: Response) {
-                    runOnUiThread {
-                        if (response.isSuccessful) {
 
-                            val intent = Intent(this@MainActivity, HomePageActivity::class.java)
-                            startActivity(intent)
-                            finish()
+                    val responseBody = response.body?.string()
+
+                    runOnUiThread {
+
+                        if (response.isSuccessful && responseBody != null) {
+
+                            try {
+                                val json = JSONObject(responseBody)
+
+                                val username = json.getString("username")
+                                val email = json.getString("email")
+                                val createdAt = json.getString("createdAt")
+
+                                val intent = Intent(this@MainActivity, HomePageActivity::class.java)
+
+                                intent.putExtra("username", username)
+                                intent.putExtra("email", email)
+                                intent.putExtra("createdAt", createdAt)
+
+                                startActivity(intent)
+                                finish()
+
+                            } catch (e: Exception) {
+                                Toast.makeText(this@MainActivity, "Parse error", Toast.LENGTH_SHORT).show()
+                            }
 
                         } else {
                             Toast.makeText(this@MainActivity, "Invalid email or password", Toast.LENGTH_SHORT).show()

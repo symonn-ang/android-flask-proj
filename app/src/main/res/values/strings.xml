@@ -19,4 +19,13 @@
     <string name="tw">tw</string>
     <string name="ooter">ooter</string>
     <string name="back">Back</string>
+    <string name="welcome_home">Welcome Home</string>
+    <string name="todays_twoot">Todays Twoot~</string>
+    <string name="user">User</string>
+    <string name="joined">Joined</string>
+    <string name="_5_10_2026">5/10/2026</string>
+    <string name="profpic">profPic</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="user_gmail_com">user@gmail.com</string>
+    <string name="ellipsis">. . .</string>
 </resources>

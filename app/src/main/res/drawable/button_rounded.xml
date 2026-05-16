@@ -1,0 +1,18 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <solid android:color="#40B0B0B0"/>
+
+<!--    Opacity	Value-->
+<!--    100%	#FFB0B0B0-->
+<!--    75%	    #BFB0B0B0-->
+<!--    50%	    #80B0B0B0-->
+<!--    25%	    #40B0B0B0-->
+<!--    0%	    #00B0B0B0-->
+
+    <corners android:radius="16dp"/>
+
+    <stroke
+        android:width="2dp"
+        android:color="@android:color/white"/>
+
+</shape>

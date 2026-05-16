@@ -30,6 +30,7 @@ class RegisterActivity : AppCompatActivity() {
         val registerBtn = findViewById<Button>(R.id.registerBtn)
         val backBtn = findViewById<Button>(R.id.backBtn)
 
+
         textView.setTextColor(android.graphics.Color.WHITE)
         textView.post {
             val paint = textView.paint
@@ -97,8 +98,8 @@ class RegisterActivity : AppCompatActivity() {
 
         val request = Request.Builder()
 //            .url("http://10.0.2.2:5000/register")
-//            .url("http://192.168.1.25:5000/register") // CHANGE THIS sa ipconfig <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-            .url("http://192.168.1.7:5000/register") // CHANGE THIS sa ipconfig <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            .url("http://192.168.1.25:5000/register") // CHANGE THIS sa ipconfig <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+//            .url("http://192.168.1.7:5000/register") // CHANGE THIS sa ipconfig <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             .post(body)
             .build()
 
@@ -111,17 +112,25 @@ class RegisterActivity : AppCompatActivity() {
             }
 
             override fun onResponse(call: Call, response: Response) {
+
                 val responseBody = response.body?.string()
+                val json = JSONObject(responseBody ?: "{}")
+
                 runOnUiThread {
+
+                    val message = json.optString("message", "Unknown response")
+
+                    Toast.makeText(this@RegisterActivity, message, Toast.LENGTH_LONG).show()
+
                     if (response.isSuccessful) {
-                        Toast.makeText(this@RegisterActivity, "Registration Successful!", Toast.LENGTH_LONG).show()
                         finish()
-                    } else {
-                        Toast.makeText(this@RegisterActivity, "Failed: ${response.code}", Toast.LENGTH_LONG).show()
                     }
                 }
+
                 println("Response: $responseBody")
             }
         })
     }
+
+
 }

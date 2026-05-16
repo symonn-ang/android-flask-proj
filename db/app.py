@@ -7,7 +7,6 @@ import bcrypt
 app = Flask(__name__)
 CORS(app)   # cross-origin 
 
-# use connection pooling
 db = mysql.connector.connect(
     host="localhost",
     user="root",
@@ -15,10 +14,11 @@ db = mysql.connector.connect(
     database="testdb"
 )
 
-cursor = db.cursor()
+# cursor = db.cursor() global chekc later
 
 @app.route('/register', methods=['POST'])
 def register():
+    cursor = db.cursor()
     try:
         data = request.get_json()
 
@@ -39,34 +39,70 @@ def register():
 
         return jsonify({"status": "success", "message": "User registered"}), 201
 
+    except mysql.connector.Error as err:
+
+        if err.errno == 1062:
+            return jsonify({
+                "status": "error",
+                "message": "Email already exists"
+            }), 409
+
+        return jsonify({
+            "status": "error",
+            "message": str(err)
+        }), 500
+
     except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
+
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
+    finally:
+        cursor.close()
     
 
 @app.route('/login', methods=['POST'])
 def login():
+    cursor = db.cursor()
     try:
         data = request.get_json()
 
         email = data.get('email')
         password = data.get('password')
 
-        cursor.execute("SELECT password FROM users WHERE email = %s", (email,))
+        cursor.execute("""
+            SELECT id, username, email, password, createdAt
+            FROM users
+            WHERE email = %s
+        """, (email,))
+
         result = cursor.fetchone()
 
         if not result:
             return jsonify({"status": "error", "message": "User not found"}), 404
 
-        stored_password = result[0]
+        user_id, username, email, stored_password, createdAt = result
 
         if bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):
-            return jsonify({"status": "success", "message": "Login successful"}), 200
+
+            return jsonify({
+                "status": "success",
+                "message": "Login successful",
+                "id": user_id,
+                "username": username,
+                "email": email,
+                "createdAt": str(createdAt).split(" ")[0]
+            }), 200
+
         else:
             return jsonify({"status": "error", "message": "Wrong password"}), 401
 
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
-    
+    finally:
+        cursor.close()
 
     
 
