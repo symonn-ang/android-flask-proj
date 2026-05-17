@@ -81,10 +81,6 @@ def register():
 def login():
     cursor = db.cursor()
 
-        # http://10.0.2.2:5000//uploads/{filename}
-        # http://192.168.1.7:5000/uploads/{filename}
-        # http://192.168.1.25:5000/uploads/{filename}
-
     try:
         data = request.get_json()
 
@@ -106,9 +102,15 @@ def login():
 
         if bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):
             profilepic_url = None
+
             if profilepic:
                 filename = os.path.basename(profilepic)
                 profilepic_url = f"http://192.168.1.25:5000/uploads/{filename}"
+
+        # http://10.0.2.2:5000//uploads/{filename}
+        # http://192.168.1.7:5000/uploads/{filename}
+        # http://192.168.1.25:5000/uploads/{filename}
+
             return jsonify({
                 "status": "success",
                 "message": "Login successful",
@@ -175,7 +177,6 @@ def upload_profile_pic():
         cursor.close()
 
 
-        
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
