@@ -129,14 +129,18 @@ class MainActivity : AppCompatActivity() {
                             try {
                                 val json = JSONObject(responseBody)
 
+                                val id = json.getInt("id")
                                 val username = json.getString("username")
                                 val email = json.getString("email")
+                                val profilepic = json.getString("profilepic")
                                 val createdAt = json.getString("createdAt")
 
                                 val intent = Intent(this@MainActivity, HomePageActivity::class.java)
 
+                                intent.putExtra("id", id)
                                 intent.putExtra("username", username)
                                 intent.putExtra("email", email)
+                                intent.putExtra("profilepic", profilepic)
                                 intent.putExtra("createdAt", createdAt)
 
                                 startActivity(intent)
