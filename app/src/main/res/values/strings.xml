@@ -28,4 +28,10 @@
     <string name="edit_profile">Edit Profile</string>
     <string name="user_gmail_com">user@gmail.com</string>
     <string name="ellipsis">. . .</string>
+    <string name="post_content_here">Post content here</string>
+    <string name="_0">0</string>
+    <string name="post">Post</string>
+    <string name="postHolder">What\'s on your mind?</string>
+    <string name="imagepicker">imagepicker</string>
+    <string name="camerafunc">camerafunc</string>
 </resources>
