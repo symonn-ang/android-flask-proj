@@ -28,18 +28,23 @@ class HomePageActivity : AppCompatActivity() {
     private lateinit var recyclerPosts: RecyclerView
     private var selectedPostImageUri: Uri? = null
     data class Post(
+        val id: Int,
+        val post_user_id: Int,
         val username: String,
         val email: String,
         val profilepic: String?,
         val post_text: String,
         val post_image: String?,
-        val createdAt: String
+        val createdAt: String,
+        var likeCount: Int,
+        var commentCount: Int,
+        var isLiked: Boolean = false
     )
 
     companion object {
         private const val CROP_PROFILE = 1001
         private const val CROP_POST = 1002
-//        add here if need
+//        add here if needed
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -202,8 +207,10 @@ class HomePageActivity : AppCompatActivity() {
         Thread {
 
             try {
+                val userId = intent.getIntExtra("id", -1)
                 val request = Request.Builder()
-                    .url("http://192.168.1.25:5000/posts")
+                    //                .url("http://10.0.2.2:5000/posts?user_id=$userId")
+                    .url("http://192.168.1.25:5000/posts?user_id=$userId")
                     .build()
 
                 val response = OkHttpClient().newCall(request).execute()
@@ -217,18 +224,63 @@ class HomePageActivity : AppCompatActivity() {
 
                     postList.add(
                         Post(
+                            obj.getInt("id"),
+                            obj.getInt("user_id"),
                             obj.getString("username"),
                             obj.getString("email"),
-                            obj.optString("profilepic"),
+                            obj.optString("profilepic", null),
                             obj.getString("post_text"),
-                            obj.optString("post_image"),
-                            obj.getString("createdAt")
+                            obj.optString("post_image", null),
+                            obj.getString("createdAt"),
+                            obj.optInt("likeCount", 0),
+                            obj.optInt("commentCount", 0),
+                            obj.optBoolean("isLiked", false)
                         )
                     )
                 }
+                lateinit var adapter: PostAdapter
+                adapter = PostAdapter(
+                    userId,
+                    postList,
+                    onLikeClick = { position, post ->
 
+                        val userId = intent.getIntExtra("id", -1)
+
+                        PostActions.toggleLike(post.id, userId) { success, liked ->
+
+                            if (success) {
+
+                                runOnUiThread {
+
+                                    post.isLiked = liked
+
+                                    if (liked) {
+                                        post.likeCount += 1
+                                    } else {
+                                        post.likeCount -= 1
+                                    }
+
+                                    adapter.notifyItemChanged(position)
+                                }
+                            }
+                        }
+                    },
+                    onDeleteClick = { position, post ->
+                        val userId = intent.getIntExtra("id", -1)
+
+                        PostActions.deletePost(post.id, userId) { success ->
+                            if (success) {
+                                runOnUiThread {
+                                    postList.removeAt(position)
+                                    adapter.notifyItemRemoved(position)
+                                }
+
+                            }
+                        }
+                    })
                 runOnUiThread {
-                    recyclerPosts.adapter = PostAdapter(postList)
+
+                    recyclerPosts.adapter = adapter
                 }
 
             } catch (e: Exception) {
@@ -237,6 +289,8 @@ class HomePageActivity : AppCompatActivity() {
 
         }.start()
     }
+
+
 
     // edit prof start here vvvv
     private val pickImage =

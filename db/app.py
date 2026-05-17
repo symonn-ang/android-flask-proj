@@ -220,35 +220,160 @@ def create_post():
     finally:
         cursor.close()
 
+@app.route('/toggle_like', methods=['POST'])
+def toggle_like():
+
+    cursor = db.cursor()
+
+    try:
+        post_id = request.form.get('post_id')
+        user_id = request.form.get('user_id')
+
+        # check if likd
+        cursor.execute("""
+            SELECT id
+            FROM post_likes
+            WHERE post_id = %s AND user_id = %s
+        """, (post_id, user_id))
+
+        existing = cursor.fetchone()
+
+        # unlike
+        if existing:
+
+            cursor.execute("""
+                DELETE FROM post_likes
+                WHERE post_id = %s AND user_id = %s
+            """, (post_id, user_id))
+
+            cursor.execute("""
+                UPDATE posts
+                SET like_count = like_count - 1
+                WHERE id = %s
+            """, (post_id,))
+
+            db.commit()
+
+            return jsonify({
+                "liked": False
+            })
+
+        # like
+        else:
+
+            cursor.execute("""
+                INSERT INTO post_likes (post_id, user_id)
+                VALUES (%s, %s)
+            """, (post_id, user_id))
+
+            cursor.execute("""
+                UPDATE posts
+                SET like_count = like_count + 1
+                WHERE id = %s
+            """, (post_id,))
+
+            db.commit()
+
+            return jsonify({
+                "liked": True
+            })
+
+    except Exception as e:
+
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
+    finally:
+        cursor.close()
+
+@app.route('/delete_post', methods=['POST'])
+def delete_post():
+    cursor = db.cursor()
+
+    try:
+        post_id = request.form.get("post_id")
+        user_id = request.form.get("user_id")
+
+        # unique del
+        cursor.execute("""
+            DELETE FROM posts
+            WHERE id = %s AND user_id = %s
+        """, (post_id, user_id))
+
+        db.commit()
+
+        return jsonify({
+            "status": "success"
+        })
+
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
+    finally:
+        cursor.close()
+
 
 
 # GET routes start here vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
 @app.route('/posts', methods=['GET'])
 def get_posts():
+
     cursor = db.cursor()
 
     try:
+
+        user_id = request.args.get('user_id')
+
         cursor.execute("""
             SELECT 
                 p.id,
+                p.user_id,
                 u.username,
                 u.email,
                 u.profilepic,
                 p.post_text,
                 p.post_image,
-                p.createdAt
+                p.createdAt,
+                p.like_count,
+                p.comment_count,
+
+                EXISTS(
+                    SELECT 1
+                    FROM post_likes pl
+                    WHERE pl.post_id = p.id
+                    AND pl.user_id = %s
+                ) AS isLiked
+
             FROM posts p
             JOIN users u ON p.user_id = u.id
             ORDER BY p.createdAt DESC
-        """)
+        """, (user_id,))
 
         results = cursor.fetchall()
 
         posts = []
 
         for row in results:
-            id, username, email, profilepic, text, image, createdAt = row
+
+            (
+                id,
+                user_id,
+                username,
+                email,
+                profilepic,
+                text,
+                image,
+                createdAt,
+                like_count,
+                comment_count,
+                isLiked
+            ) = row
 
             if profilepic:
                 profilepic = f"http://192.168.1.25:5000/{profilepic}"
@@ -258,17 +383,22 @@ def get_posts():
 
             posts.append({
                 "id": id,
+                "user_id": user_id,
                 "username": username,
                 "email": email,
                 "profilepic": profilepic,
                 "post_text": text,
                 "post_image": image,
-                "createdAt": str(createdAt)
+                "createdAt": str(createdAt),
+                "likeCount": like_count,
+                "commentCount": comment_count,
+                "isLiked": bool(isLiked)
             })
 
         return jsonify(posts)
 
     except Exception as e:
+
         return jsonify({
             "status": "error",
             "message": str(e)

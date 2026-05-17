@@ -4,6 +4,7 @@ import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -14,7 +15,10 @@ import java.util.Date
 import java.util.concurrent.TimeUnit
 
 class PostAdapter(
-    private val posts: List<HomePageActivity.Post>
+    private val currentUserId: Int,
+    private val posts: MutableList<HomePageActivity.Post>,
+    private val onLikeClick: (Int, HomePageActivity.Post) -> Unit,
+    private val onDeleteClick: (Int, HomePageActivity.Post) -> Unit,
 ) : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
 
     class PostViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -25,6 +29,8 @@ class PostAdapter(
         val txtPost: TextView = view.findViewById(R.id.txtPost)
         val imgPost: ImageView = view.findViewById(R.id.imgPost)
         val timeStamp: TextView = view.findViewById(R.id.timeStampLayout)
+        val btnLike: ImageView = view.findViewById(R.id.btnLike)
+        val likeCount: TextView = view.findViewById(R.id.likeCount)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
@@ -81,10 +87,56 @@ class PostAdapter(
 
         val post = posts[position]
 
+        val isOwner = post.post_user_id == currentUserId
+        val deleteBtn = holder.itemView.findViewById<ImageButton>(R.id.btnDelete)
+        val editBtn = holder.itemView.findViewById<ImageButton>(R.id.btnEdit)
+
         holder.txtUsername.text = post.username
         holder.txtEmail.text = post.email
         holder.txtPost.text = post.post_text
         holder.timeStamp.text = getTimeAgo(post.createdAt)
+        holder.likeCount.text = post.likeCount.toString()
+
+
+        if (isOwner) {
+            deleteBtn.alpha = 1f
+            editBtn.alpha = 1f
+
+            deleteBtn.isEnabled = true
+            editBtn.isEnabled = true
+        } else {
+            deleteBtn.alpha = 0.3f
+            editBtn.alpha = 0.3f
+
+            deleteBtn.isEnabled = false
+            editBtn.isEnabled = false
+        }
+
+        holder.itemView.findViewById<ImageButton>(R.id.btnDelete).setOnClickListener {
+            val context = holder.itemView.context
+
+            androidx.appcompat.app.AlertDialog.Builder(context)
+                .setTitle("Delete Post")
+                .setMessage("Are you sure you want to delete this post?")
+                .setPositiveButton("Yes") { dialog, _ ->
+                    onDeleteClick(position, post)
+                    dialog.dismiss()
+                }
+                .setNegativeButton("No") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
+        }
+
+
+        if (post.isLiked) {
+            holder.btnLike.setImageResource(R.drawable.baseline_favorite_24)
+        } else {
+            holder.btnLike.setImageResource(R.drawable.outline_favorite_24)
+        }
+        holder.btnLike.setOnClickListener {
+            onLikeClick(position, post)
+        }
 
         // for profpic
         if (!post.profilepic.isNullOrEmpty()) {
