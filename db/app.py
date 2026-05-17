@@ -29,6 +29,9 @@ def uploaded_file(filename):
 
 # global functions up there ^^^
 # cursor = db.cursor() global chekc later
+# http://10.0.2.2:5000//uploads/{filename}
+# http://192.168.1.7:5000/uploads/{filename}
+# http://192.168.1.25:5000/uploads/{filename}
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -176,7 +179,106 @@ def upload_profile_pic():
     finally:
         cursor.close()
 
+@app.route('/create_post', methods=['POST'])
+def create_post():
+    cursor = db.cursor()
 
+    try:
+        user_id = request.form.get('user_id')
+        post_text = request.form.get('post_text')
+
+        image_path = None
+
+        if 'image' in request.files:
+            image = request.files['image']
+
+            filename = f"{user_id}_{int(time.time())}.jpg"
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+            image.save(filepath)
+
+            image_path = filepath
+
+        query = """
+            INSERT INTO posts (user_id, post_text, post_image)
+            VALUES (%s, %s, %s)
+        """
+
+        cursor.execute(query, (user_id, post_text, image_path))
+        db.commit()
+
+        return jsonify({
+            "status": "success"
+        }), 201
+
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
+    finally:
+        cursor.close()
+
+
+
+# GET routes start here vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+@app.route('/posts', methods=['GET'])
+def get_posts():
+    cursor = db.cursor()
+
+    try:
+        cursor.execute("""
+            SELECT 
+                p.id,
+                u.username,
+                u.email,
+                u.profilepic,
+                p.post_text,
+                p.post_image,
+                p.createdAt
+            FROM posts p
+            JOIN users u ON p.user_id = u.id
+            ORDER BY p.createdAt DESC
+        """)
+
+        results = cursor.fetchall()
+
+        posts = []
+
+        for row in results:
+            id, username, email, profilepic, text, image, createdAt = row
+
+            if profilepic:
+                profilepic = f"http://192.168.1.25:5000/{profilepic}"
+
+            if image:
+                image = f"http://192.168.1.25:5000/{image}"
+
+            posts.append({
+                "id": id,
+                "username": username,
+                "email": email,
+                "profilepic": profilepic,
+                "post_text": text,
+                "post_image": image,
+                "createdAt": str(createdAt)
+            })
+
+        return jsonify(posts)
+
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
+    finally:
+        cursor.close()
+
+
+        
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

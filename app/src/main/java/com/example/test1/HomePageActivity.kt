@@ -8,6 +8,10 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import android.net.Uri
+import android.view.View
+import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.Toast
 import com.yalantis.ucrop.UCrop
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -15,17 +19,46 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Request
 import okhttp3.OkHttpClient
 import java.io.File
-
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 
 class HomePageActivity : AppCompatActivity() {
 
     private lateinit var iconProfilePic: ImageView
+    private lateinit var recyclerPosts: RecyclerView
+    private var selectedPostImageUri: Uri? = null
+    data class Post(
+        val username: String,
+        val email: String,
+        val profilepic: String?,
+        val post_text: String,
+        val post_image: String?,
+        val createdAt: String
+    )
+
+    companion object {
+        private const val CROP_PROFILE = 1001
+        private const val CROP_POST = 1002
+//        add here if need
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.homepage)
 
+        val etPostText = findViewById<EditText>(R.id.etPostText)
+        val btnPost = findViewById<Button>(R.id.btnPost)
+        val imgSelected = findViewById<ImageView>(R.id.imgSelected)
+        val btnRemoveImage = findViewById<ImageButton>(R.id.btnRemoveImage)
+
         iconProfilePic = findViewById(R.id.iconProfilePic)
+        recyclerPosts = findViewById(R.id.recyclerPosts)
+        recyclerPosts.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+
+        recyclerPosts.setHasFixedSize(false)
+        recyclerPosts.isNestedScrollingEnabled = false
+
 
         val editProfPicLayout = findViewById<Button>(R.id.editProfPicLayout)
 
@@ -70,13 +103,147 @@ class HomePageActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        findViewById<ImageButton>(R.id.btnImage).setOnClickListener {
+            pickPostImage.launch("image/*")
+        }
+
+        btnPost.setOnClickListener {
+
+            val text = etPostText.text.toString()
+            if (text.isBlank() && selectedPostImageUri == null) {
+                Toast.makeText(this, "Please enter a twoot or something", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            val userId = intent.getIntExtra("id", -1)
+
+            Thread {
+
+                try {
+                    val builder = MultipartBody.Builder()
+                        .setType(MultipartBody.FORM)
+                        .addFormDataPart("user_id", userId.toString())
+                        .addFormDataPart("post_text", text)
+
+                    if (selectedPostImageUri != null) {
+                        val inputStream = contentResolver.openInputStream(selectedPostImageUri!!)
+                        val bytes = inputStream!!.readBytes()
+
+                        builder.addFormDataPart(
+                            "image",
+                            "post.jpg",
+                            bytes.toRequestBody("image/*".toMediaType())
+                        )
+                    }
+
+                    val requestBody = builder.build()
+
+                    val request = Request.Builder()
+//                        .url("http://10.0.2.2:5000/create_post")
+                        .url("http://192.168.1.25:5000/create_post")
+                        .post(requestBody)
+                        .build()
+
+                    val response = OkHttpClient().newCall(request).execute()
+
+                    if (response.isSuccessful) {
+
+                        runOnUiThread {
+
+                            loadPosts()
+
+                            etPostText.text.clear()
+
+                            selectedPostImageUri = null
+
+                            imgSelected.setImageDrawable(null)
+                            imgSelected.visibility = View.GONE
+
+                            btnRemoveImage.visibility = View.GONE
+                        }
+                    }
+
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+
+            }.start()
+        }
+        btnRemoveImage.setOnClickListener {
+
+            selectedPostImageUri = null
+
+            imgSelected.setImageDrawable(null)
+
+            imgSelected.visibility = View.GONE
+            btnRemoveImage.visibility = View.GONE
+        }
+
+        loadPosts()
+
     }
 
+
+
+    private val pickPostImage =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+//            if (uri != null) {
+//                selectedPostImageUri = uri
+//                findViewById<ImageView>(R.id.imgSelected).setImageURI(uri)
+//                findViewById<ImageView>(R.id.imgSelected).visibility = View.VISIBLE
+//                findViewById<ImageButton>(R.id.btnRemoveImage).visibility = View.VISIBLE
+//            }
+            if (uri != null) {
+                startCrop(uri, CROP_POST)
+            }
+        }
+
+    private fun loadPosts() {
+
+        Thread {
+
+            try {
+                val request = Request.Builder()
+                    .url("http://192.168.1.25:5000/posts")
+                    .build()
+
+                val response = OkHttpClient().newCall(request).execute()
+                val body = response.body?.string()
+
+                val jsonArray = org.json.JSONArray(body)
+                val postList = mutableListOf<Post>()
+
+                for (i in 0 until jsonArray.length()) {
+                    val obj = jsonArray.getJSONObject(i)
+
+                    postList.add(
+                        Post(
+                            obj.getString("username"),
+                            obj.getString("email"),
+                            obj.optString("profilepic"),
+                            obj.getString("post_text"),
+                            obj.optString("post_image"),
+                            obj.getString("createdAt")
+                        )
+                    )
+                }
+
+                runOnUiThread {
+                    recyclerPosts.adapter = PostAdapter(postList)
+                }
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
+        }.start()
+    }
+
+    // edit prof start here vvvv
     private val pickImage =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-//            used lib here instead github ucrop
+//            used lib here instead, GitHub ucrop check ra dependency n manifest
             if (uri != null) {
-                startCrop(uri)
+                startCrop(uri, CROP_PROFILE)
             }
         }
 
@@ -123,16 +290,13 @@ class HomePageActivity : AppCompatActivity() {
         }.start()
     }
 
-
-//    github UCrop
-
-    private fun startCrop(uri: Uri) {
-        val destUri = Uri.fromFile(File(cacheDir, "cropped.jpg"))
+    private fun startCrop(uri: Uri, requestCode: Int) {
+        val destUri = Uri.fromFile(File(cacheDir, "cropped_${requestCode}.jpg"))
 
         UCrop.of(uri, destUri)
             .withAspectRatio(1f, 1f)
-            .withMaxResultSize(500, 500)
-            .start(this)
+            .withMaxResultSize(1000, 1000)
+            .start(this, requestCode)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -140,7 +304,7 @@ class HomePageActivity : AppCompatActivity() {
 
         when (requestCode) {
 
-            UCrop.REQUEST_CROP -> {
+            CROP_PROFILE -> {
                 if (resultCode == RESULT_OK && data != null) {
 
                     val resultUri = UCrop.getOutput(data)
@@ -149,12 +313,30 @@ class HomePageActivity : AppCompatActivity() {
                         iconProfilePic.setImageURI(resultUri)
                         uploadImage(resultUri)
                     }
-
-                } else if (resultCode == UCrop.RESULT_ERROR) {
-
-                    val error = UCrop.getError(data!!)
-                    error?.printStackTrace()
                 }
+            }
+
+            CROP_POST -> {
+                if (resultCode == RESULT_OK && data != null) {
+
+                    val resultUri = UCrop.getOutput(data)
+
+                    if (resultUri != null) {
+                        selectedPostImageUri = resultUri
+
+                        findViewById<ImageView>(R.id.imgSelected).apply {
+                            setImageURI(resultUri)
+                            visibility = View.VISIBLE
+                        }
+
+                        findViewById<ImageButton>(R.id.btnRemoveImage).visibility = View.VISIBLE
+                    }
+                }
+            }
+
+            UCrop.RESULT_ERROR -> {
+                val error = UCrop.getError(data!!)
+                error?.printStackTrace()
             }
         }
     }
