@@ -21,12 +21,20 @@ import okhttp3.OkHttpClient
 import java.io.File
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.core.content.FileProvider
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+//import android.provider.MediaStore
 
 class HomePageActivity : AppCompatActivity() {
 
     private lateinit var iconProfilePic: ImageView
     private lateinit var recyclerPosts: RecyclerView
     private var selectedPostImageUri: Uri? = null
+    private var cameraImageUri: Uri? = null
+
     data class Post(
         val id: Int,
         val post_user_id: Int,
@@ -44,6 +52,7 @@ class HomePageActivity : AppCompatActivity() {
     companion object {
         private const val CROP_PROFILE = 1001
         private const val CROP_POST = 1002
+        private const val CAMERA_PERMISSION_CODE = 2001
 //        add here if needed
     }
 
@@ -110,6 +119,26 @@ class HomePageActivity : AppCompatActivity() {
 
         findViewById<ImageButton>(R.id.btnImage).setOnClickListener {
             pickPostImage.launch("image/*")
+        }
+//        or dis
+        findViewById<ImageButton>(R.id.btnCamera).setOnClickListener {
+            if (
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.CAMERA
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+
+                openCamera()
+
+            } else {
+
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.CAMERA),
+                    CAMERA_PERMISSION_CODE
+                )
+            }
         }
 
         btnPost.setOnClickListener {
@@ -199,6 +228,15 @@ class HomePageActivity : AppCompatActivity() {
 //            }
             if (uri != null) {
                 startCrop(uri, CROP_POST)
+            }
+        }
+//    or dis
+    private val takePicture =
+        registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+
+            if (success && cameraImageUri != null) {
+
+                startCrop(cameraImageUri!!, CROP_POST)
             }
         }
 
@@ -304,6 +342,19 @@ class HomePageActivity : AppCompatActivity() {
     private fun openGallery() {
         pickImage.launch("image/*")
     }
+//    or dis
+    private fun openCamera() {
+
+        val imageFile = File(cacheDir, "camera_photo.jpg")
+
+        cameraImageUri = FileProvider.getUriForFile(
+            this,
+            "${packageName}.provider",
+            imageFile
+        )
+
+        takePicture.launch(cameraImageUri!!)
+    }
 
     private fun uploadImage(uri: Uri) {
 
@@ -391,6 +442,32 @@ class HomePageActivity : AppCompatActivity() {
             UCrop.RESULT_ERROR -> {
                 val error = UCrop.getError(data!!)
                 error?.printStackTrace()
+            }
+        }
+    }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == CAMERA_PERMISSION_CODE) {
+
+            if (
+                grantResults.isNotEmpty() &&
+                grantResults[0] == PackageManager.PERMISSION_GRANTED
+            ) {
+
+                openCamera()
+
+            } else {
+
+                Toast.makeText(
+                    this,
+                    "Camera permission denied",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
