@@ -369,7 +369,49 @@ def edit_post():
     finally:
         cursor.close()
 
+@app.route('/create_comment', methods=['POST'])
+def create_comment():
 
+    cursor = db.cursor()
+
+    try:
+
+        user_id = request.form.get("user_id")
+        post_id = request.form.get("post_id")
+        comment_text = request.form.get("comment_text")
+
+        if not comment_text:
+            return jsonify({
+                "status": "error",
+                "message": "Comment is empty"
+            }), 400
+
+        cursor.execute("""
+            INSERT INTO comments (user_id, post_id, comment_text)
+            VALUES (%s, %s, %s)
+        """, (user_id, post_id, comment_text))
+
+        cursor.execute("""
+            UPDATE posts
+            SET comment_count = comment_count + 1
+            WHERE id = %s
+        """, (post_id,))
+
+        db.commit()
+
+        return jsonify({
+            "status": "success"
+        })
+
+    except Exception as e:
+
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
+    finally:
+        cursor.close()
 
 # GET routes start here vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
