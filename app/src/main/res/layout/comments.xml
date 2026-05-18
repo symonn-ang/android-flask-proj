@@ -8,19 +8,43 @@
     android:orientation="vertical"
     android:background="@color/bg_gray"
     >
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical"
+        >
+        <TextView
+            android:layout_marginStart="10dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/comments"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            />
+        <ImageButton
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/outline_close_24"
+            android:background="@android:color/transparent"
+            />
+
+
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/darkerGray"
+        />
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:text="@string/comments"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:textColor="@color/white"
+        android:scrollbars="vertical"
         />
-    <ImageButton
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:src="@drawable/outline_close_24"
-        />
+
 
 </LinearLayout>
