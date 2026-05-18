@@ -23,7 +23,8 @@ class PostAdapter(
     private val posts: MutableList<HomePageActivity.Post>,
     private val onLikeClick: (Int, HomePageActivity.Post) -> Unit,
     private val onDeleteClick: (Int, HomePageActivity.Post) -> Unit,
-    private val onEditClick: (Int, HomePageActivity.Post) -> Unit
+    private val onEditClick: (Int, HomePageActivity.Post) -> Unit,
+    private val onCommentClick: (Int, HomePageActivity.Post) -> Unit
 ) : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
 
     class PostViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -37,6 +38,8 @@ class PostAdapter(
         val btnLike: ImageView = view.findViewById(R.id.btnLike)
         val likeCount: TextView = view.findViewById(R.id.likeCount)
         val btnEdit: ImageButton = view.findViewById(R.id.btnEdit)
+        val btnComment: ImageButton = view.findViewById(R.id.btnComment)
+        val commentCount: TextView = view.findViewById(R.id.commentCount)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
@@ -131,6 +134,7 @@ class PostAdapter(
         holder.txtPost.text = post.post_text
         holder.timeStamp.text = getTimeAgo(post.createdAt)
         holder.likeCount.text = post.likeCount.toString()
+        holder.commentCount.text = post.commentCount.toString()
 
 
         if (isOwner) {
@@ -148,6 +152,15 @@ class PostAdapter(
         }
 
 //        onclick stuff vv
+
+        holder.btnComment.setOnClickListener {
+
+            val currentPosition = holder.adapterPosition
+
+            if (currentPosition != RecyclerView.NO_POSITION) {
+                onCommentClick(currentPosition, posts[currentPosition])
+            }
+        }
 
         holder.btnEdit.setOnClickListener {
             val currentPosition = holder.adapterPosition

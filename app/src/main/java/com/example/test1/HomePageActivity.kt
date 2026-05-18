@@ -225,6 +225,175 @@ class HomePageActivity : AppCompatActivity() {
                         }
                     }
                 }
+            },
+            onCommentClick = { position, post ->
+
+                val bottomSheet = BottomSheetDialog(this)
+
+                val view = layoutInflater.inflate(
+                    R.layout.comment_modal,
+                    null
+                )
+
+                bottomSheet.setContentView(view)
+                bottomSheet.show()
+
+                val imgCurrentUser =
+                    view.findViewById<ImageView>(R.id.imgCurrentUser)
+
+                val recyclerComments =
+                    view.findViewById<RecyclerView>(R.id.recyclerComments)
+
+                val etComment =
+                    view.findViewById<EditText>(R.id.etCommentInput)
+
+                val btnSend =
+                    view.findViewById<ImageButton>(R.id.btnSendComment)
+
+                val commentsList = mutableListOf<Comment>()
+
+                fun refreshComments() {
+
+                    PostActions.loadComments(post.id) { success, comments ->
+
+                        if (success) {
+
+                            runOnUiThread {
+
+                                commentsList.clear()
+
+                                commentsList.addAll(comments)
+
+                                commentAdapter.notifyDataSetChanged()
+                            }
+                        }
+                    }
+                }
+
+                val currentProfilePic = intent.getStringExtra("profilepic")
+
+                if (!currentProfilePic.isNullOrEmpty()) {
+
+                    Thread {
+                        try {
+
+                            val bitmap = android.graphics.BitmapFactory.decodeStream(
+                                java.net.URL(currentProfilePic).openStream()
+                            )
+
+                            runOnUiThread {
+                                imgCurrentUser.setImageBitmap(bitmap)
+                            }
+
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+
+                    }.start()
+                }
+
+                val commentAdapter =
+                    CommentAdapter(
+
+                        userId,
+                        commentsList,
+
+                        onEditClick = { comment ->
+
+                            val editText = EditText(this)
+
+                            editText.setText(comment.comment_text)
+
+                            androidx.appcompat.app.AlertDialog.Builder(this)
+                                .setTitle("Edit Comment")
+                                .setView(editText)
+
+                                .setPositiveButton("Save") { _, _ ->
+
+                                    PostActions.editComment(
+                                        comment.id,
+                                        userId,
+                                        editText.text.toString()
+                                    ) { success ->
+
+                                        if (success) {
+
+                                            runOnUiThread {
+                                                refreshComments()
+                                            }
+                                        }
+                                    }
+                                }
+
+                                .setNegativeButton("Cancel", null)
+                                .show()
+                        },
+
+                        onDeleteClick = { comment ->
+
+                            PostActions.deleteComment(
+                                comment.id,
+                                userId
+                            ) { success ->
+
+                                if (success) {
+
+                                    runOnUiThread {
+
+                                        post.commentCount -= 1
+
+                                        adapter.notifyItemChanged(position)
+
+                                        refreshComments()
+                                    }
+                                }
+                            }
+                        }
+                    )
+
+                recyclerComments.layoutManager =
+                    LinearLayoutManager(this)
+
+                recyclerComments.adapter = commentAdapter
+
+
+                refreshComments()
+
+                btnSend.setOnClickListener {
+
+                    val commentText = etComment.text.toString()
+
+                    if (commentText.isBlank()) {
+                        return@setOnClickListener
+                    }
+
+                    PostActions.createComment(
+                        userId,
+                        post.id,
+                        commentText
+                    ) { success ->
+
+                        if (success) {
+
+                            runOnUiThread {
+
+                                etComment.text.clear()
+
+                                post.commentCount += 1
+
+                                adapter.notifyItemChanged(position)
+
+                                refreshComments()
+                            }
+                        }
+                    }
+                }
+
+                view.findViewById<ImageButton>(R.id.btnClose)
+                    .setOnClickListener {
+
+                        bottomSheet.dismiss()
+                    }
             }
         )
 

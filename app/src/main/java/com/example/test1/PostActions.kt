@@ -13,6 +13,168 @@ object PostActions {
 
     private val client = OkHttpClient()
 
+
+    fun loadComments(
+        postId: Int,
+        callback: (Boolean, List<Comment>) -> Unit
+    ) {
+
+        Thread {
+
+            try {
+
+                val request = Request.Builder()
+//                .url("http://10.0.2.2:5000/comments?post_id=$postId")
+                    .url("http://192.168.1.25:5000/comments?post_id=$postId")
+                    .build()
+
+                val response = client.newCall(request).execute()
+
+                val body = response.body?.string()
+
+                val jsonArray = org.json.JSONArray(body)
+
+                val comments = mutableListOf<Comment>()
+
+                for (i in 0 until jsonArray.length()) {
+
+                    val obj = jsonArray.getJSONObject(i)
+
+                    comments.add(
+                        Comment(
+                            obj.getInt("id"),
+                            obj.getInt("user_id"),
+                            obj.getInt("post_id"),
+                            obj.getString("username"),
+                            obj.optString("profilepic", null),
+                            obj.getString("comment_text"),
+                            obj.getString("createdAt")
+                        )
+                    )
+                }
+
+                callback(true, comments)
+
+            } catch (e: Exception) {
+
+                e.printStackTrace()
+
+                callback(false, emptyList())
+            }
+
+        }.start()
+    }
+
+    fun createComment(
+        userId: Int,
+        postId: Int,
+        commentText: String,
+        callback: (Boolean) -> Unit
+    ) {
+
+        Thread {
+
+            try {
+
+                val body = MultipartBody.Builder()
+                    .setType(MultipartBody.FORM)
+                    .addFormDataPart("user_id", userId.toString())
+                    .addFormDataPart("post_id", postId.toString())
+                    .addFormDataPart("comment_text", commentText)
+                    .build()
+
+                val request = Request.Builder()
+                    //                .url("http://10.0.2.2:5000/create_comment")
+                    .url("http://192.168.1.25:5000/create_comment")
+                    .post(body)
+                    .build()
+
+                val response = client.newCall(request).execute()
+
+                callback(response.isSuccessful)
+
+            } catch (e: Exception) {
+
+                e.printStackTrace()
+
+                callback(false)
+            }
+
+        }.start()
+    }
+
+    fun deleteComment(
+        commentId: Int,
+        userId: Int,
+        callback: (Boolean) -> Unit
+    ) {
+
+        Thread {
+
+            try {
+
+                val body = FormBody.Builder()
+                    .add("comment_id", commentId.toString())
+                    .add("user_id", userId.toString())
+                    .build()
+
+                val request = Request.Builder()
+//                .url("http://10.0.2.2:5000/comments?post_id=$postId")
+                    .url("http://192.168.1.25:5000/delete_comment")
+                    .post(body)
+                    .build()
+
+                val response = client.newCall(request).execute()
+
+                callback(response.isSuccessful)
+
+            } catch (e: Exception) {
+
+                e.printStackTrace()
+
+                callback(false)
+            }
+
+        }.start()
+    }
+
+    fun editComment(
+        commentId: Int,
+        userId: Int,
+        commentText: String,
+        callback: (Boolean) -> Unit
+    ) {
+
+        Thread {
+
+            try {
+
+                val body = FormBody.Builder()
+                    .add("comment_id", commentId.toString())
+                    .add("user_id", userId.toString())
+                    .add("comment_text", commentText)
+                    .build()
+
+                val request = Request.Builder()
+//                .url("http://10.0.2.2:5000/comments?post_id=$postId")
+                    .url("http://192.168.1.25:5000/edit_comment")
+                    .post(body)
+                    .build()
+
+                val response = client.newCall(request).execute()
+
+                callback(response.isSuccessful)
+
+            } catch (e: Exception) {
+
+                e.printStackTrace()
+
+                callback(false)
+            }
+
+        }.start()
+    }
+
     fun toggleLike(postId: Int, userId: Int, callback: (Boolean, Boolean) -> Unit) {
 
         Thread {

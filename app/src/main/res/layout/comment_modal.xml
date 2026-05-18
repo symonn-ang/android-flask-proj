@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@drawable/editpost_bg"
+
+    >
+
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center"
+        android:background="#CCCCCC"
+        android:layout_marginBottom="12dp"
+        android:layout_marginTop="16dp"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="15dp"
+        android:paddingHorizontal="16dp"
+        >
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/comments"
+            android:textStyle="bold"
+            android:textColor="@color/opacwhite"
+            android:textSize="18sp"/>
+
+        <ImageButton
+            android:id="@+id/btnClose"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@android:color/transparent"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"/>
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerComments"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scrollbars="vertical"
+        android:fadeScrollbars="true"
+        android:clipToPadding="false"
+        android:paddingVertical="8dp"
+        android:paddingHorizontal="16dp"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.2dp"
+        android:background="@color/darkerGray"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="12dp"
+        >
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="6dp"
+            android:elevation="2dp"
+            >
+            <ImageView
+                android:id="@+id/imgCurrentUser"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/profpic_rounded"
+                android:src="@drawable/defaulticon"
+                android:scaleType="centerCrop"
+                android:clipToOutline="true"
+                android:layout_marginEnd="12dp"
+                />
+
+            <EditText
+                android:id="@+id/etCommentInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/enter_your_comment"
+                android:textColor="#F2F3F5"
+                android:textColorHint="#949BA4"
+                android:background="@drawable/postinput_border"
+                android:paddingVertical="12dp"
+                android:paddingHorizontal="10dp"
+                android:maxLines="4"
+                android:textSize="14sp"
+                android:inputType="textMultiLine"
+                tools:ignore="HardcodedText" />
+
+        </LinearLayout>
+        <ImageButton
+            android:id="@+id/btnSendComment"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:src="@drawable/outline_arrow_circle_right_24"
+            android:background="@android:color/transparent"
+            app:tint="#5865F2"
+            android:scaleType="fitCenter"
+            android:clipToOutline="true"
+            android:padding="4dp"
+            />
+
+    </LinearLayout>
+
+
+</LinearLayout>

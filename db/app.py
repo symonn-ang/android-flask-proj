@@ -208,12 +208,12 @@ def create_post():
         db.commit()
 
         post_id = cursor.lastrowid
-        
+
         return jsonify({
             "status": "success",
-            "post_id": post_id
+            "post_id": post_id  # send dis to android
         }), 201
-
+    
     except Exception as e:
         return jsonify({
             "status": "error",
@@ -390,7 +390,7 @@ def create_comment():
             }), 400
 
         cursor.execute("""
-            INSERT INTO comments (user_id, post_id, comment_text)
+            INSERT INTO post_comments (user_id, post_id, comment_text)
             VALUES (%s, %s, %s)
         """, (user_id, post_id, comment_text))
 
@@ -525,7 +525,7 @@ def get_comments():
                 u.username,
                 u.profilepic
 
-            FROM comments c
+            FROM post_comments c
 
             JOIN users u
             ON c.user_id = u.id
@@ -552,7 +552,7 @@ def get_comments():
             ) = row
 
             if profilepic:
-                profilepic = f"http://192.168.1.25:5000/%7Bprofilepic%7D"
+                profilepic = f"http://192.168.1.25:5000/{profilepic}"
 
             comments.append({
                 "id": comment_id,
