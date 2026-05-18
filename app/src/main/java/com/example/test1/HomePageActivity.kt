@@ -26,6 +26,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.android.material.bottomsheet.BottomSheetDialog
 //import android.provider.MediaStore
 
 class HomePageActivity : AppCompatActivity() {
@@ -34,6 +35,13 @@ class HomePageActivity : AppCompatActivity() {
     private lateinit var recyclerPosts: RecyclerView
     private var selectedPostImageUri: Uri? = null
     private var cameraImageUri: Uri? = null
+    private lateinit var editPostImage: EditPostImage
+    private var pendingEditImageUri: Uri? = null
+    private var editingPostPosition: Int = -1
+    private var editingImagePreview: ImageView? = null
+    private var isEditingPost = false
+    private val postList = mutableListOf<Post>()
+    private lateinit var adapter: PostAdapter
 
     data class Post(
         val id: Int,
@@ -41,8 +49,8 @@ class HomePageActivity : AppCompatActivity() {
         val username: String,
         val email: String,
         val profilepic: String?,
-        val post_text: String,
-        val post_image: String?,
+        var post_text: String,
+        var post_image: String?,
         val createdAt: String,
         var likeCount: Int,
         var commentCount: Int,
@@ -51,7 +59,8 @@ class HomePageActivity : AppCompatActivity() {
 
     companion object {
         private const val CROP_PROFILE = 1001
-        private const val CROP_POST = 1002
+        private const val CROP_NEW_POST = 1002
+        private const val CROP_EDIT_POST = 1003
         private const val CAMERA_PERMISSION_CODE = 2001
 //        add here if needed
     }
@@ -69,6 +78,156 @@ class HomePageActivity : AppCompatActivity() {
         recyclerPosts = findViewById(R.id.recyclerPosts)
         recyclerPosts.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        val userId = intent.getIntExtra("id", -1)
+
+        adapter = PostAdapter(
+            userId,
+            postList,
+
+            onLikeClick = { position, post ->
+
+                val userId = intent.getIntExtra("id", -1)
+
+                PostActions.toggleLike(post.id, userId) { success, liked ->
+
+                    if (success) {
+
+                        runOnUiThread {
+
+                            post.isLiked = liked
+
+                            if (liked) {
+                                post.likeCount += 1
+                            } else {
+                                post.likeCount -= 1
+                            }
+
+                            adapter.notifyItemChanged(position)
+                        }
+                    }
+                }
+            },
+            onDeleteClick = { position, post ->
+                val userId = intent.getIntExtra("id", -1)
+
+                PostActions.deletePost(post.id, userId) { success ->
+                    if (success) {
+                        runOnUiThread {
+                            val index = postList.indexOfFirst { it.id == post.id }
+
+                            if (index != -1) {
+                                postList.removeAt(index)
+                                adapter.notifyItemRemoved(index)
+                            }
+                        }
+
+                    }
+                }
+            },
+            onEditClick = { position, post ->
+
+                editingPostPosition = position
+
+                val bottomSheet = BottomSheetDialog(this)
+                val view = layoutInflater.inflate(R.layout.edit_post, null)
+
+                bottomSheet.setContentView(view)
+                bottomSheet.show()
+
+                val etEdit = view.findViewById<EditText>(R.id.etEditPost)
+                val imgPreview = view.findViewById<ImageView>(R.id.imgPreview)
+
+                isEditingPost = true
+                editingImagePreview = imgPreview
+                editingPostPosition = position
+
+                editingImagePreview = imgPreview
+
+                etEdit.setText(post.post_text)
+                pendingEditImageUri = null
+
+                if (!post.post_image.isNullOrEmpty()) {
+
+                    imgPreview.visibility = View.VISIBLE
+
+                    Thread {
+                        try {
+                            val url = java.net.URL(post.post_image)
+                            val bitmap = android.graphics.BitmapFactory.decodeStream(url.openStream())
+
+                            runOnUiThread {
+                                imgPreview.setImageBitmap(bitmap)
+                            }
+
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }.start()
+
+                } else {
+                    imgPreview.visibility = View.GONE
+                }
+
+                view.findViewById<ImageButton>(R.id.btnGallery).setOnClickListener {
+                    pickEditImage.launch("image/*")
+                }
+
+                view.findViewById<ImageButton>(R.id.btnCamera).setOnClickListener {
+                    isEditingPost = true
+
+                    if (
+                        ContextCompat.checkSelfPermission(
+                            this,
+                            Manifest.permission.CAMERA
+                        ) == PackageManager.PERMISSION_GRANTED
+                    ) {
+
+                        openCamera()
+
+                    } else {
+
+                        ActivityCompat.requestPermissions(
+                            this,
+                            arrayOf(Manifest.permission.CAMERA),
+                            CAMERA_PERMISSION_CODE
+                        )
+                    }
+                }
+                view.findViewById<ImageButton>(R.id.btnClose).setOnClickListener {
+                    pendingEditImageUri = null
+                    editingImagePreview = null
+                    isEditingPost = false
+
+                    bottomSheet.dismiss()
+                }
+
+                view.findViewById<Button>(R.id.btnUpdate).setOnClickListener {
+
+                    PostActions.editPost(
+                        post.id,
+                        userId,
+                        etEdit.text.toString(),
+                        pendingEditImageUri,
+                        contentResolver
+                    ) { success ->
+
+                        if (success) runOnUiThread {
+                            post.post_text = etEdit.text.toString()
+                            if (pendingEditImageUri != null) {
+                                post.post_image = pendingEditImageUri.toString()
+                            }
+                            recyclerPosts.adapter?.notifyItemChanged(position)
+                            pendingEditImageUri = null
+                            editingImagePreview = null
+                            isEditingPost = false
+                            bottomSheet.dismiss()
+                        }
+                    }
+                }
+            }
+        )
+
+        recyclerPosts.adapter = adapter
 
         recyclerPosts.setHasFixedSize(false)
         recyclerPosts.isNestedScrollingEnabled = false
@@ -140,6 +299,15 @@ class HomePageActivity : AppCompatActivity() {
                 )
             }
         }
+//start now
+        editPostImage = EditPostImage(this) { uri ->
+            selectedPostImageUri = uri
+            findViewById<ImageView>(R.id.imgSelected).apply {
+                setImageURI(uri)
+                visibility = View.VISIBLE
+            }
+            findViewById<ImageButton>(R.id.btnRemoveImage).visibility = View.VISIBLE
+        }
 
         btnPost.setOnClickListener {
 
@@ -183,7 +351,24 @@ class HomePageActivity : AppCompatActivity() {
 
                         runOnUiThread {
 
-                            loadPosts()
+                            val newPost = Post(
+                                id = 0,
+                                post_user_id = userId,
+                                username = username ?: "",
+                                email = email ?: "",
+                                profilepic = profilepic,
+                                post_text = text,
+                                post_image = selectedPostImageUri?.toString(),
+                                createdAt = "now",
+                                likeCount = 0,
+                                commentCount = 0,
+                                isLiked = false
+                            )
+
+                            postList.add(0, newPost)
+                            adapter.notifyItemInserted(0)
+
+                            recyclerPosts.scrollToPosition(0)
 
                             etPostText.text.clear()
 
@@ -227,7 +412,7 @@ class HomePageActivity : AppCompatActivity() {
 //                findViewById<ImageButton>(R.id.btnRemoveImage).visibility = View.VISIBLE
 //            }
             if (uri != null) {
-                startCrop(uri, CROP_POST)
+                startCrop(uri, CROP_NEW_POST)
             }
         }
 //    or dis
@@ -236,7 +421,11 @@ class HomePageActivity : AppCompatActivity() {
 
             if (success && cameraImageUri != null) {
 
-                startCrop(cameraImageUri!!, CROP_POST)
+                if (isEditingPost) {
+                    startCrop(cameraImageUri!!, CROP_EDIT_POST)
+                } else {
+                    startCrop(cameraImageUri!!, CROP_NEW_POST)
+                }
             }
         }
 
@@ -255,12 +444,14 @@ class HomePageActivity : AppCompatActivity() {
                 val body = response.body?.string()
 
                 val jsonArray = org.json.JSONArray(body)
-                val postList = mutableListOf<Post>()
+
+                val newPosts = mutableListOf<Post>()
 
                 for (i in 0 until jsonArray.length()) {
+
                     val obj = jsonArray.getJSONObject(i)
 
-                    postList.add(
+                    newPosts.add(
                         Post(
                             obj.getInt("id"),
                             obj.getInt("user_id"),
@@ -276,49 +467,12 @@ class HomePageActivity : AppCompatActivity() {
                         )
                     )
                 }
-                lateinit var adapter: PostAdapter
-                adapter = PostAdapter(
-                    userId,
-                    postList,
-                    onLikeClick = { position, post ->
 
-                        val userId = intent.getIntExtra("id", -1)
-
-                        PostActions.toggleLike(post.id, userId) { success, liked ->
-
-                            if (success) {
-
-                                runOnUiThread {
-
-                                    post.isLiked = liked
-
-                                    if (liked) {
-                                        post.likeCount += 1
-                                    } else {
-                                        post.likeCount -= 1
-                                    }
-
-                                    adapter.notifyItemChanged(position)
-                                }
-                            }
-                        }
-                    },
-                    onDeleteClick = { position, post ->
-                        val userId = intent.getIntExtra("id", -1)
-
-                        PostActions.deletePost(post.id, userId) { success ->
-                            if (success) {
-                                runOnUiThread {
-                                    postList.removeAt(position)
-                                    adapter.notifyItemRemoved(position)
-                                }
-
-                            }
-                        }
-                    })
                 runOnUiThread {
+                    postList.clear()
+                    postList.addAll(newPosts)
 
-                    recyclerPosts.adapter = adapter
+                    adapter.notifyDataSetChanged()
                 }
 
             } catch (e: Exception) {
@@ -328,7 +482,13 @@ class HomePageActivity : AppCompatActivity() {
         }.start()
     }
 
-
+    private val pickEditImage =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            if (uri != null) {
+                isEditingPost = true
+                startCrop(uri, CROP_EDIT_POST)
+            }
+        }
 
     // edit prof start here vvvv
     private val pickImage =
@@ -421,20 +581,26 @@ class HomePageActivity : AppCompatActivity() {
                 }
             }
 
-            CROP_POST -> {
-                if (resultCode == RESULT_OK && data != null) {
+            CROP_NEW_POST -> {
+                val resultUri = UCrop.getOutput(data!!)
+                if (resultUri != null) {
+                    selectedPostImageUri = resultUri
+                    findViewById<ImageView>(R.id.imgSelected).apply {
+                        setImageURI(resultUri)
+                        visibility = View.VISIBLE
+                    }
+                }
+            }
 
-                    val resultUri = UCrop.getOutput(data)
+            CROP_EDIT_POST -> {
+                val resultUri = UCrop.getOutput(data!!)
+                if (resultUri != null) {
 
-                    if (resultUri != null) {
-                        selectedPostImageUri = resultUri
+                    pendingEditImageUri = resultUri
 
-                        findViewById<ImageView>(R.id.imgSelected).apply {
-                            setImageURI(resultUri)
-                            visibility = View.VISIBLE
-                        }
-
-                        findViewById<ImageButton>(R.id.btnRemoveImage).visibility = View.VISIBLE
+                    editingImagePreview?.let {
+                        it.setImageURI(resultUri)
+                        it.visibility = View.VISIBLE
                     }
                 }
             }

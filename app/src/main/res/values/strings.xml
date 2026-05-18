@@ -34,4 +34,8 @@
     <string name="postHolder">What\'s on your mind?</string>
     <string name="imagepicker">imagepicker</string>
     <string name="camerafunc">camerafunc</string>
+    <string name="closebtn">closeBtn</string>
+    <string name="edit_post">Edit Post</string>
+    <string name="edit_your_post">Edit your post...</string>
+    <string name="Done">Done</string>
 </resources>

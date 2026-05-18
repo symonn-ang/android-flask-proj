@@ -1,5 +1,7 @@
 package com.example.test1
 
+import android.app.Dialog
+import android.content.Context
 import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +10,8 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.github.chrisbanes.photoview.PhotoView
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -19,6 +23,7 @@ class PostAdapter(
     private val posts: MutableList<HomePageActivity.Post>,
     private val onLikeClick: (Int, HomePageActivity.Post) -> Unit,
     private val onDeleteClick: (Int, HomePageActivity.Post) -> Unit,
+    private val onEditClick: (Int, HomePageActivity.Post) -> Unit
 ) : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
 
     class PostViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -31,6 +36,7 @@ class PostAdapter(
         val timeStamp: TextView = view.findViewById(R.id.timeStampLayout)
         val btnLike: ImageView = view.findViewById(R.id.btnLike)
         val likeCount: TextView = view.findViewById(R.id.likeCount)
+        val btnEdit: ImageButton = view.findViewById(R.id.btnEdit)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
@@ -79,8 +85,37 @@ class PostAdapter(
 
         } catch (e: Exception) {
 
-            "Unknown"
+            "now"
         }
+    }
+
+    private fun showFullScreenImage(context: Context, imageUrl: String) {
+        val dialog = Dialog(context, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
+        dialog.setContentView(R.layout.post_full_image)
+
+        val photoView: PhotoView = dialog.findViewById(R.id.fullImageView)
+        val btnClose: ImageButton = dialog.findViewById(R.id.btnClose)
+
+        Thread {
+            try {
+                val bitmap = BitmapFactory.decodeStream(URL(imageUrl).openStream())
+                photoView.post {
+                    photoView.setImageResource(R.drawable.outline_image_search_24)
+                    photoView.setImageBitmap(bitmap)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }.start()
+//        try glide
+//        Glide.with(context)
+//            .load(imageUrl)
+//            .into(photoView)
+
+        btnClose.setOnClickListener { dialog.dismiss() }
+        photoView.setOnClickListener { dialog.dismiss() }
+
+        dialog.show()
     }
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
@@ -112,6 +147,10 @@ class PostAdapter(
             editBtn.isEnabled = false
         }
 
+        holder.btnEdit.setOnClickListener {
+            onEditClick(position, post)
+        }
+
         holder.itemView.findViewById<ImageButton>(R.id.btnDelete).setOnClickListener {
             val context = holder.itemView.context
 
@@ -138,7 +177,7 @@ class PostAdapter(
             onLikeClick(position, post)
         }
 
-        // for profpic
+        // for profilepic
         if (!post.profilepic.isNullOrEmpty()) {
 
             Thread {
@@ -156,6 +195,33 @@ class PostAdapter(
                     e.printStackTrace()
                 }
             }.start()
+        }
+        if (!post.post_image.isNullOrEmpty() && post.post_image != "null") {
+
+            holder.imgPost.visibility = View.VISIBLE
+
+            Thread {
+                try {
+                    val bitmap = BitmapFactory.decodeStream(
+                        URL(post.post_image).openStream()
+                    )
+
+                    holder.itemView.post {
+                        holder.imgPost.setImageBitmap(bitmap)
+
+                        holder.imgPost.setOnClickListener {
+                            showFullScreenImage(holder.itemView.context, post.post_image!!)
+                        }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }.start()
+
+        } else {
+            holder.imgPost.visibility = View.GONE
+            holder.imgPost.setImageBitmap(null)
+            holder.imgPost.setOnClickListener(null)
         }
 
         if (

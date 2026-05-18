@@ -317,6 +317,58 @@ def delete_post():
     finally:
         cursor.close()
 
+@app.route('/edit_post', methods=['POST'])
+def edit_post():
+
+    cursor = db.cursor()
+
+    try:
+        post_id = request.form.get("post_id")
+        user_id = request.form.get("user_id")
+        post_text = request.form.get("post_text")
+
+        image_path = None
+
+        if 'image' in request.files:
+            image = request.files['image']
+
+            filename = f"{post_id}_{int(time.time())}.jpg"
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+            image.save(filepath)
+            image_path = filepath
+        
+        if image_path:
+            cursor.execute("""
+                UPDATE posts
+                SET post_text = %s,
+                    post_image = %s
+                WHERE id = %s AND user_id = %s
+            """, (post_text, image_path, post_id, user_id))
+        
+        else:
+            cursor.execute("""
+                UPDATE posts
+                SET post_text = %s
+                WHERE id = %s AND user_id = %s
+            """, (post_text, post_id, user_id))
+
+        db.commit()
+
+        return jsonify({
+            "status": "success"
+        })
+
+    except Exception as e:
+
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
+    finally:
+        cursor.close()
+
 
 
 # GET routes start here vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
