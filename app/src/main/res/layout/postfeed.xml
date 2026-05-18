@@ -97,6 +97,7 @@
             android:layout_marginStart="8dp"
             android:text="@string/post"
             android:backgroundTint="@color/blue"
+            android:background="@drawable/button_rounded"
             />
 
 

@@ -27,6 +27,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="30dp"
         android:elevation="10dp"
+
         >
 
         <ImageView
@@ -114,7 +115,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/user_gmail_com"
                 android:textColor="@color/darkerGray"
-                android:textSize="20sp"
+                android:textSize="15sp"
                 />
 
         <LinearLayout
@@ -132,7 +133,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/joined"
                 android:textColor="@color/darkerGray"
-                android:textSize="20sp"
+                android:textSize="15sp"
                 app:drawableStartCompat="@drawable/outline_calendar_month_24"
                 android:drawablePadding="6dp"
                 />
@@ -143,7 +144,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/_5_10_2026"
                 android:textColor="@color/darkerGray"
-                android:textSize="20sp"
+                android:textSize="15sp"
                 android:layout_marginStart="5dp"
                 />
 
