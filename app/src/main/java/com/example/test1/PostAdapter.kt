@@ -147,18 +147,27 @@ class PostAdapter(
             editBtn.isEnabled = false
         }
 
+//        onclick stuff vv
+
         holder.btnEdit.setOnClickListener {
-            onEditClick(position, post)
+            val currentPosition = holder.adapterPosition
+
+            if (currentPosition != RecyclerView.NO_POSITION) {
+                onEditClick(currentPosition, posts[currentPosition])
+            }
         }
 
         holder.itemView.findViewById<ImageButton>(R.id.btnDelete).setOnClickListener {
             val context = holder.itemView.context
+            val currentPosition = holder.adapterPosition
 
             androidx.appcompat.app.AlertDialog.Builder(context)
                 .setTitle("Delete Post")
                 .setMessage("Are you sure you want to delete this post?")
                 .setPositiveButton("Yes") { dialog, _ ->
-                    onDeleteClick(position, post)
+                    if (currentPosition != RecyclerView.NO_POSITION) {
+                        onDeleteClick(currentPosition, posts[currentPosition])
+                    }
                     dialog.dismiss()
                 }
                 .setNegativeButton("No") { dialog, _ ->
@@ -174,7 +183,11 @@ class PostAdapter(
             holder.btnLike.setImageResource(R.drawable.outline_favorite_24)
         }
         holder.btnLike.setOnClickListener {
-            onLikeClick(position, post)
+            val currentPosition = holder.adapterPosition
+
+            if (currentPosition != RecyclerView.NO_POSITION) {
+                onLikeClick(currentPosition, posts[currentPosition])
+            }
         }
 
         // for profilepic
@@ -221,37 +234,9 @@ class PostAdapter(
         } else {
             holder.imgPost.visibility = View.GONE
             holder.imgPost.setImageBitmap(null)
+            holder.imgPost.setImageDrawable(null)
             holder.imgPost.setOnClickListener(null)
         }
 
-        if (
-            !post.post_image.isNullOrEmpty() &&
-            post.post_image != "null"
-        ) {
-
-            holder.imgPost.visibility = View.VISIBLE
-
-            Thread {
-                try {
-
-                    val bitmap = BitmapFactory.decodeStream(
-                        URL(post.post_image).openStream()
-                    )
-
-                    holder.itemView.post {
-                        holder.imgPost.setImageBitmap(bitmap)
-                    }
-
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }.start()
-
-        } else {
-
-            holder.imgPost.setImageBitmap(null)
-            holder.imgPost.setImageDrawable(null)
-            holder.imgPost.visibility = View.GONE
-        }
     }
 }

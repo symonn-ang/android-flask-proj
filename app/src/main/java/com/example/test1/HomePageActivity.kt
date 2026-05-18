@@ -117,7 +117,10 @@ class HomePageActivity : AppCompatActivity() {
 
                             if (index != -1) {
                                 postList.removeAt(index)
+
                                 adapter.notifyItemRemoved(index)
+
+                                adapter.notifyItemRangeChanged(index, postList.size)
                             }
                         }
 
@@ -140,8 +143,6 @@ class HomePageActivity : AppCompatActivity() {
                 isEditingPost = true
                 editingImagePreview = imgPreview
                 editingPostPosition = position
-
-                editingImagePreview = imgPreview
 
                 etEdit.setText(post.post_text)
                 pendingEditImageUri = null
@@ -216,7 +217,7 @@ class HomePageActivity : AppCompatActivity() {
                             if (pendingEditImageUri != null) {
                                 post.post_image = pendingEditImageUri.toString()
                             }
-                            recyclerPosts.adapter?.notifyItemChanged(position)
+                            recyclerPosts.adapter?.notifyItemChanged(position, "edit")
                             pendingEditImageUri = null
                             editingImagePreview = null
                             isEditingPost = false
@@ -349,26 +350,13 @@ class HomePageActivity : AppCompatActivity() {
 
                     if (response.isSuccessful) {
 
+                        val responseBody = response.body?.string()
+
+                        val json = org.json.JSONObject(responseBody!!)
+
+                        val newPostId = json.getInt("post_id")
+
                         runOnUiThread {
-
-                            val newPost = Post(
-                                id = 0,
-                                post_user_id = userId,
-                                username = username ?: "",
-                                email = email ?: "",
-                                profilepic = profilepic,
-                                post_text = text,
-                                post_image = selectedPostImageUri?.toString(),
-                                createdAt = "now",
-                                likeCount = 0,
-                                commentCount = 0,
-                                isLiked = false
-                            )
-
-                            postList.add(0, newPost)
-                            adapter.notifyItemInserted(0)
-
-                            recyclerPosts.scrollToPosition(0)
 
                             etPostText.text.clear()
 
@@ -378,8 +366,11 @@ class HomePageActivity : AppCompatActivity() {
                             imgSelected.visibility = View.GONE
 
                             btnRemoveImage.visibility = View.GONE
+
+                            loadPosts()
                         }
                     }
+//                            recyclerPosts.scrollToPosition(0)
 
                 } catch (e: Exception) {
                     e.printStackTrace()

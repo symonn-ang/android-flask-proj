@@ -186,7 +186,7 @@ def create_post():
     try:
         user_id = request.form.get('user_id')
         post_text = request.form.get('post_text')
-
+        
         image_path = None
 
         if 'image' in request.files:
@@ -207,8 +207,11 @@ def create_post():
         cursor.execute(query, (user_id, post_text, image_path))
         db.commit()
 
+        post_id = cursor.lastrowid
+        
         return jsonify({
-            "status": "success"
+            "status": "success",
+            "post_id": post_id
         }), 201
 
     except Exception as e:
