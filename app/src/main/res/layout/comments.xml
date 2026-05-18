@@ -45,6 +45,69 @@
         android:layout_weight="1"
         android:scrollbars="vertical"
         />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#1A1A1A"
+        android:visibility="visible"
+        >
+        <TextView
+            android:layout_marginStart="10dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Replying to username"
+            android:textSize="20sp"
+            android:textColor="@color/white"
+            />
+        <ImageButton
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/outline_close_24"
+            android:background="@android:color/transparent"
+            />
 
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:background="@color/bg_gray"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/imgCurrentUser"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:scaleType="centerCrop"
+            android:background="@drawable/profpic_rounded"
+            android:clipToOutline="true" />
+
+        <EditText
+            android:id="@+id/etCommentInput"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
+            android:hint="Write a comment..."
+            android:textColor="@color/white"
+            android:textColorHint="@color/darkerGray"
+            android:background="@drawable/postinput_border"
+            android:padding="12dp"
+            android:maxLines="4"
+            android:inputType="textMultiLine" />
+
+        <ImageButton
+            android:id="@+id/btnSendComment"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/outline_chat_bubble_24"
+            android:background="@android:color/transparent"
+            app:tint="@color/white" />
+    </LinearLayout>
 
 </LinearLayout>
