@@ -415,6 +415,8 @@ def create_comment():
 
 # GET routes start here vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
+
+
 @app.route('/posts', methods=['GET'])
 def get_posts():
 
@@ -501,8 +503,77 @@ def get_posts():
     finally:
         cursor.close()
 
+@app.route('/comments', methods=['GET'])
+def get_comments():
 
-        
+    cursor = db.cursor()
+
+    try:
+
+        post_id = request.args.get("post_id")
+
+        cursor.execute("""
+            SELECT
+                c.id,
+                c.user_id,
+                c.post_id,
+                c.comment_text,
+                c.createdAt,
+                u.username,
+                u.profilepic
+
+            FROM comments c
+
+            JOIN users u
+            ON c.user_id = u.id
+
+            WHERE c.post_id = %s
+
+            ORDER BY c.createdAt ASC
+        """, (post_id,))
+
+        results = cursor.fetchall()
+
+        comments = []
+
+        for row in results:
+
+            (
+                comment_id,
+                user_id,
+                post_id,
+                comment_text,
+                createdAt,
+                username,
+                profilepic
+            ) = row
+
+            if profilepic:
+                profilepic = f"http://192.168.1.25:5000/%7Bprofilepic%7D"
+
+            comments.append({
+                "id": comment_id,
+                "user_id": user_id,
+                "post_id": post_id,
+                "comment_text": comment_text,
+                "createdAt": str(createdAt),
+                "username": username,
+                "profilepic": profilepic
+            })
+
+        return jsonify(comments)
+
+    except Exception as e:
+
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
+    finally:
+        cursor.close()
+
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
