@@ -27,6 +27,7 @@ import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import android.view.LayoutInflater
 //import android.provider.MediaStore
 
 class HomePageActivity : AppCompatActivity() {
@@ -42,6 +43,7 @@ class HomePageActivity : AppCompatActivity() {
     private var isEditingPost = false
     private val postList = mutableListOf<Post>()
     private lateinit var adapter: PostAdapter
+    lateinit var commentAdapter: CommentAdapter
 
     data class Post(
         val id: Int,
@@ -292,7 +294,7 @@ class HomePageActivity : AppCompatActivity() {
                     }.start()
                 }
 
-                val commentAdapter =
+                    commentAdapter =
                     CommentAdapter(
 
                         userId,
@@ -300,25 +302,70 @@ class HomePageActivity : AppCompatActivity() {
 
                         onEditClick = { comment ->
 
-                            val editText = EditText(this)
+                            val dialogView = layoutInflater.inflate(
+                                R.layout.edit_comment,
+                                null
+                            )
+
+                            val editText =
+                                dialogView.findViewById<EditText>(R.id.etEditComment)
 
                             editText.setText(comment.comment_text)
 
-                            androidx.appcompat.app.AlertDialog.Builder(this)
-                                .setTitle("Edit Comment")
-                                .setView(editText)
-
+                            val dialog = androidx.appcompat.app.AlertDialog.Builder(this)
+                                .setTitle("")
+                                .setView(dialogView)
                                 .setPositiveButton("Save") { _, _ ->
+
+                                    val newText = editText.text.toString()
 
                                     PostActions.editComment(
                                         comment.id,
                                         userId,
-                                        editText.text.toString()
+                                        newText
+                                    ) { success ->
+
+                                        if (success) {
+                                            runOnUiThread {
+                                                refreshComments()
+                                            }
+                                        }
+                                    }
+                                }
+                                .setNegativeButton("Cancel", null)
+                                .create()
+
+                            dialog.window?.setBackgroundDrawableResource(R.drawable.edit_comment_style)
+
+                            dialog.show()
+
+                            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+                                .setTextColor(android.graphics.Color.parseColor("#1DA1F2"))
+
+                            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE)
+                                .setTextColor(android.graphics.Color.GRAY)
+                        },
+
+                        onDeleteClick = { comment ->
+
+                            val dialog = androidx.appcompat.app.AlertDialog.Builder(this, R.style.CustomAlertDialog)
+                                .setTitle("Delete Comment")
+                                .setMessage("Are you sure you want to delete this comment?")
+                                .setPositiveButton("Delete") { _, _ ->
+
+                                    PostActions.deleteComment(
+                                        comment.id,
+                                        userId
                                     ) { success ->
 
                                         if (success) {
 
                                             runOnUiThread {
+
+                                                post.commentCount -= 1
+
+                                                adapter.notifyItemChanged(position)
+
                                                 refreshComments()
                                             }
                                         }
@@ -326,28 +373,20 @@ class HomePageActivity : AppCompatActivity() {
                                 }
 
                                 .setNegativeButton("Cancel", null)
-                                .show()
-                        },
+                                .create()
 
-                        onDeleteClick = { comment ->
+                            dialog.window?.setBackgroundDrawableResource(R.drawable.edit_comment_style)
 
-                            PostActions.deleteComment(
-                                comment.id,
-                                userId
-                            ) { success ->
+                            dialog.show()
+                            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+                                .setTextColor(android.graphics.Color.parseColor("#FF0000"))
 
-                                if (success) {
+                            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE)
+                                .setTextColor(android.graphics.Color.GRAY)
 
-                                    runOnUiThread {
 
-                                        post.commentCount -= 1
 
-                                        adapter.notifyItemChanged(position)
 
-                                        refreshComments()
-                                    }
-                                }
-                            }
                         }
                     )
 

@@ -416,9 +416,6 @@ def create_comment():
     finally:
         cursor.close()
 
-
-
-
 @app.route('/delete_comment', methods=['POST'])
 def delete_comment():
 
@@ -471,7 +468,6 @@ def delete_comment():
 
     finally:
         cursor.close()
-
 
 @app.route('/edit_comment', methods=['POST'])
 def edit_comment():

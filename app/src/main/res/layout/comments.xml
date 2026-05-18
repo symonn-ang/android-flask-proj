@@ -155,6 +155,10 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="0.2dp"
-        android:background="@color/darkerGray"/>
+        android:background="@color/darkerGray_50"
+        android:elevation="2dp"
+        android:translationZ="2dp"
+
+        />
 
 </LinearLayout>

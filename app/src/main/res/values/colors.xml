@@ -9,6 +9,7 @@
     <color name="blue">#4d94ff</color>
     <color name="gray">#9494b8</color>
     <color name="darkerGray">#818181</color>
-
+    <color name="darkerGray_50">#80818181</color>
+    <color name="darkerGray_30">#4D818181</color>
     <color name="red">#E0245E</color>
 </resources>

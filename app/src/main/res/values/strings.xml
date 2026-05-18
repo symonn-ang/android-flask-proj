@@ -20,7 +20,7 @@
     <string name="ooter">ooter</string>
     <string name="back">Back</string>
     <string name="welcome_home">Welcome Home</string>
-    <string name="todays_twoot">Todays Twoot~</string>
+    <string name="todays_twoot">Today\'s Twoot~</string>
     <string name="user">User</string>
     <string name="joined">Joined</string>
     <string name="_5_10_2026">5/10/2026</string>
@@ -36,10 +36,11 @@
     <string name="camerafunc">camerafunc</string>
     <string name="closebtn">closeBtn</string>
     <string name="edit_post">Edit Post</string>
-    <string name="edit_your_post">Edit your post...</string>
+    <string name="edit_your_post">Edit your post…</string>
     <string name="Done">Done</string>
     <string name="create_your_account">Create your account</string>
     <string name="join_and_get_inspired">Join and get Inspired</string>
     <string name="comments">Comments</string>
-    <string name="enter_your_comment">Enter your comment...</string>
+    <string name="enter_your_comment">Enter your comment…</string>
+    <string name="edit_comment">Edit comment…</string>
 </resources>
