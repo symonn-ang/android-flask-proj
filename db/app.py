@@ -416,6 +416,98 @@ def create_comment():
     finally:
         cursor.close()
 
+
+
+
+@app.route('/delete_comment', methods=['POST'])
+def delete_comment():
+
+    cursor = db.cursor()
+
+    try:
+
+        comment_id = request.form.get("comment_id")
+        user_id = request.form.get("user_id")
+
+        cursor.execute("""
+            SELECT post_id
+            FROM post_comments
+            WHERE id = %s
+        """, (comment_id,))
+
+        result = cursor.fetchone()
+
+        if not result:
+            return jsonify({
+                "status": "error",
+                "message": "Comment not found"
+            }), 404
+
+        post_id = result[0]
+
+        cursor.execute("""
+            DELETE FROM post_comments
+            WHERE id = %s AND user_id = %s
+        """, (comment_id, user_id))
+
+        cursor.execute("""
+            UPDATE posts
+            SET comment_count = comment_count - 1
+            WHERE id = %s
+        """, (post_id,))
+
+        db.commit()
+
+        return jsonify({
+            "status": "success"
+        })
+
+    except Exception as e:
+
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
+    finally:
+        cursor.close()
+
+
+@app.route('/edit_comment', methods=['POST'])
+def edit_comment():
+
+    cursor = db.cursor()
+
+    try:
+
+        comment_id = request.form.get("comment_id")
+        user_id = request.form.get("user_id")
+        comment_text = request.form.get("comment_text")
+
+        cursor.execute("""
+            UPDATE post_comments
+            SET comment_text = %s
+            WHERE id = %s AND user_id = %s
+        """, (comment_text, comment_id, user_id))
+
+        db.commit()
+
+        return jsonify({
+            "status": "success"
+        })
+
+    except Exception as e:
+
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
+    finally:
+        cursor.close()
+
+
+
 # GET routes start here vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
 
