@@ -1,9 +1,9 @@
 # dependencies
 
-## okhttp
-## UCrop
-## PhotoView
-## Glide
+### okhttp
+### UCrop
+### PhotoView
+### Glide
 
 - implementation("com.squareup.okhttp3:okhttp:4.12.0") (https://github.com/square/okhttp)
 - implementation("com.github.yalantis:ucrop:2.2.10") (https://github.com/Yalantis/uCrop)
