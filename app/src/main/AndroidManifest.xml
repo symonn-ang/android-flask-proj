@@ -27,6 +27,8 @@
 
         <activity android:name=".RegisterActivity" />
         <activity android:name=".HomePageActivity" />
+        <activity android:name=".FeedPageActivity" />
+
 
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"

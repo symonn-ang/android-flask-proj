@@ -72,6 +72,11 @@ class HomePageActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.homepage)
+        findViewById<ImageButton>(R.id.btnHomePage)
+            .setImageResource(R.drawable.baseline_person_24)
+
+        findViewById<ImageButton>(R.id.btnFeedPage)
+            .setImageResource(R.drawable.outline_home_24)
 
         val etPostText = findViewById<EditText>(R.id.etPostText)
         val btnPost = findViewById<Button>(R.id.btnPost)
@@ -492,6 +497,26 @@ class HomePageActivity : AppCompatActivity() {
             openGallery()
         }
 
+        val btnHomePage = findViewById<ImageButton>(R.id.btnHomePage)
+        val btnFeedPage = findViewById<ImageButton>(R.id.btnFeedPage)
+
+        btnHomePage.setOnClickListener {
+            val intent = Intent(this, HomePageActivity::class.java)
+            passUserData(intent)
+            startActivity(intent)
+            overridePendingTransition(0, 0)
+            finish()
+        }
+
+        btnFeedPage.setOnClickListener {
+            val intent = Intent(this, FeedPageActivity::class.java)
+            passUserData(intent)
+            startActivity(intent)
+            overridePendingTransition(0, 0)
+            finish()
+        }
+
+
         val usernameText = findViewById<TextView>(R.id.usernameLayout)
         val emailText = findViewById<TextView>(R.id.emailLayout)
         val dateText = findViewById<TextView>(R.id.dateLayout)
@@ -645,7 +670,14 @@ class HomePageActivity : AppCompatActivity() {
     }
 
 
+    private fun passUserData(intent: Intent) {
 
+        intent.putExtra("id", this.intent.getIntExtra("id", -1))
+        intent.putExtra("username", this.intent.getStringExtra("username"))
+        intent.putExtra("email", this.intent.getStringExtra("email"))
+        intent.putExtra("profilepic", this.intent.getStringExtra("profilepic"))
+        intent.putExtra("createdAt", this.intent.getStringExtra("createdAt"))
+    }
     private val pickPostImage =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
 //            if (uri != null) {
@@ -680,8 +712,8 @@ class HomePageActivity : AppCompatActivity() {
                 val userId = intent.getIntExtra("id", -1)
                 val request = Request.Builder()
                     //                .url("http://10.0.2.2:5000/posts?user_id=$userId")
-                    .url("http://192.168.1.25:5000/posts?user_id=$userId") // or
-//                    .url("http://192.168.1.25:5000/my_posts?user_id=$userId")
+//                    .url("http://192.168.1.25:5000/posts?user_id=$userId") // or
+                    .url("http://192.168.1.25:5000/my_posts?user_id=$userId")
                     .build()
 
                 val response = OkHttpClient().newCall(request).execute()
