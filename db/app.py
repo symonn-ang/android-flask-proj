@@ -329,7 +329,8 @@ def edit_post():
         post_id = request.form.get("post_id")
         user_id = request.form.get("user_id")
         post_text = request.form.get("post_text")
-
+        remove_image = request.form.get("remove_image") == "true"
+        
         image_path = None
 
         if 'image' in request.files:
@@ -339,17 +340,22 @@ def edit_post():
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
             image.save(filepath)
-            image_path = filepath
-        
-        if image_path:
             cursor.execute("""
                 UPDATE posts
                 SET post_text = %s,
                     post_image = %s
                 WHERE id = %s AND user_id = %s
-            """, (post_text, image_path, post_id, user_id))
-        
+                """, (post_text, filepath, post_id, user_id))
+        elif remove_image:
+
+            cursor.execute("""
+                UPDATE posts
+                SET post_text = %s,
+                    post_image = NULL
+                WHERE id = %s AND user_id = %s
+            """, (post_text, post_id, user_id))
         else:
+
             cursor.execute("""
                 UPDATE posts
                 SET post_text = %s
@@ -541,6 +547,95 @@ def get_posts():
             JOIN users u ON p.user_id = u.id
             ORDER BY p.createdAt DESC
         """, (user_id,))
+
+        results = cursor.fetchall()
+
+        posts = []
+
+        for row in results:
+
+            (
+                id,
+                user_id,
+                username,
+                email,
+                profilepic,
+                text,
+                image,
+                createdAt,
+                like_count,
+                comment_count,
+                isLiked
+            ) = row
+
+            if profilepic:
+                profilepic = f"http://192.168.1.25:5000/{profilepic}"
+
+            if image:
+                image = f"http://192.168.1.25:5000/{image}"
+
+            posts.append({
+                "id": id,
+                "user_id": user_id,
+                "username": username,
+                "email": email,
+                "profilepic": profilepic,
+                "post_text": text,
+                "post_image": image,
+                "createdAt": str(createdAt),
+                "likeCount": like_count,
+                "commentCount": comment_count,
+                "isLiked": bool(isLiked)
+            })
+
+        return jsonify(posts)
+
+    except Exception as e:
+
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
+    finally:
+        cursor.close()
+    
+@app.route('/my_posts', methods=['GET'])
+def get_my_posts():
+
+    cursor = db.cursor()
+
+    try:
+
+        user_id = request.args.get('user_id')
+
+        cursor.execute("""
+            SELECT 
+                p.id,
+                p.user_id,
+                u.username,
+                u.email,
+                u.profilepic,
+                p.post_text,
+                p.post_image,
+                p.createdAt,
+                p.like_count,
+                p.comment_count,
+
+                EXISTS(
+                    SELECT 1
+                    FROM post_likes pl
+                    WHERE pl.post_id = p.id
+                    AND pl.user_id = %s
+                ) AS isLiked
+
+            FROM posts p
+            JOIN users u ON p.user_id = u.id
+
+            WHERE p.user_id = %s
+
+            ORDER BY p.createdAt DESC
+        """, (user_id, user_id))
 
         results = cursor.fetchall()
 

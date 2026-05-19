@@ -40,10 +40,12 @@ class HomePageActivity : AppCompatActivity() {
     private var pendingEditImageUri: Uri? = null
     private var editingPostPosition: Int = -1
     private var editingImagePreview: ImageView? = null
+    private var editingRemoveButton: ImageButton? = null
     private var isEditingPost = false
     private val postList = mutableListOf<Post>()
     private lateinit var adapter: PostAdapter
     lateinit var commentAdapter: CommentAdapter
+    private var removeExistingImage = false
 
     data class Post(
         val id: Int,
@@ -142,13 +144,21 @@ class HomePageActivity : AppCompatActivity() {
                 val etEdit = view.findViewById<EditText>(R.id.etEditPost)
                 val imgPreview = view.findViewById<ImageView>(R.id.imgPreview)
                 val btnRemoveEditImage = view.findViewById<ImageButton>(R.id.btnRemoveEditImage)
-
+                if (post.post_image.isNullOrEmpty() || post.post_image == "null") {
+                    imgPreview.setImageDrawable(null)
+                    imgPreview.visibility = View.GONE
+                    btnRemoveEditImage.visibility = View.GONE
+                    pendingEditImageUri = null
+                    post.post_image = null
+                }
                 isEditingPost = true
                 editingImagePreview = imgPreview
+                editingRemoveButton = btnRemoveEditImage
                 editingPostPosition = position
 
                 etEdit.setText(post.post_text)
                 pendingEditImageUri = null
+                removeExistingImage = false
 
                 if (!post.post_image.isNullOrEmpty()) {
 
@@ -173,19 +183,19 @@ class HomePageActivity : AppCompatActivity() {
                     imgPreview.setImageDrawable(null)
                     imgPreview.visibility = View.GONE
                     btnRemoveEditImage.visibility = View.GONE
+                    pendingEditImageUri = null
+                    post.post_image = null
                 }
 
                 btnRemoveEditImage.setOnClickListener {
 
-                    pendingEditImageUri = null
-
-                    imgPreview.setImageDrawable(null)
-
                     imgPreview.visibility = View.GONE
-
                     btnRemoveEditImage.visibility = View.GONE
 
-                    post.post_image = null
+                    imgPreview.setImageDrawable(null)
+                    removeExistingImage = true
+                    pendingEditImageUri = null
+//                    post.post_image = null
                 }
 
                 view.findViewById<ImageButton>(R.id.btnGallery).setOnClickListener {
@@ -223,11 +233,27 @@ class HomePageActivity : AppCompatActivity() {
 
                 view.findViewById<Button>(R.id.btnUpdate).setOnClickListener {
 
+                    val cleanText = etEdit.text.toString().trim()
+
+                    val hasText = cleanText.isNotEmpty()
+                    val hasNewImage = pendingEditImageUri != null
+                    val hasExistingImage = !post.post_image.isNullOrEmpty()
+                    val removedImage = removeExistingImage
+
+                    val willHaveImage =
+                        hasNewImage || (hasExistingImage && !removedImage)
+
+                    if (!hasText && !willHaveImage) {
+                        Toast.makeText(this, "Post cannot be empty", Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+
                     PostActions.editPost(
                         post.id,
                         userId,
                         etEdit.text.toString(),
                         pendingEditImageUri,
+                        removeExistingImage,
                         contentResolver
                     ) { success ->
 
@@ -654,7 +680,8 @@ class HomePageActivity : AppCompatActivity() {
                 val userId = intent.getIntExtra("id", -1)
                 val request = Request.Builder()
                     //                .url("http://10.0.2.2:5000/posts?user_id=$userId")
-                    .url("http://192.168.1.25:5000/posts?user_id=$userId")
+                    .url("http://192.168.1.25:5000/posts?user_id=$userId") // or
+//                    .url("http://192.168.1.25:5000/my_posts?user_id=$userId")
                     .build()
 
                 val response = OkHttpClient().newCall(request).execute()
@@ -826,6 +853,10 @@ class HomePageActivity : AppCompatActivity() {
                         it.setImageURI(resultUri)
                         it.visibility = View.VISIBLE
                     }
+                    editingRemoveButton?.visibility = View.VISIBLE
+
+                    removeExistingImage = false
+                    pendingEditImageUri = resultUri
                 }
             }
 

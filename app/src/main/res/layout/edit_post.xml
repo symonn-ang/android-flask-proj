@@ -72,7 +72,7 @@
         android:background="@android:color/transparent"
         android:src="@drawable/outline_close_24"
         app:tint="@color/darkerGray"
-        android:visibility="visible"
+        android:visibility="gone"
         />
 
     <LinearLayout

@@ -211,6 +211,7 @@ object PostActions {
         userId: Int,
         postText: String,
         imageUri: Uri?,
+        removeImage: Boolean,
         contentResolver: ContentResolver,
         callback: (Boolean) -> Unit
     ) {
@@ -223,6 +224,10 @@ object PostActions {
                     .addFormDataPart("post_id", postId.toString())
                     .addFormDataPart("user_id", userId.toString())
                     .addFormDataPart("post_text", postText)
+                    .addFormDataPart(
+                        "remove_image",
+                        removeImage.toString()
+                    )
 
                 if (imageUri != null) {
                     val inputStream = contentResolver.openInputStream(imageUri)
