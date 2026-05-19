@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -14,14 +15,13 @@
         android:layout_height="4dp"
         android:layout_gravity="center"
         android:background="#CCCCCC"
-        android:layout_marginBottom="12dp"/>
+        android:layout_marginBottom="12dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:layout_marginBottom="15dp"
-        >
+        android:layout_marginBottom="15dp">
 
         <TextView
             android:layout_width="0dp"
@@ -30,14 +30,14 @@
             android:text="@string/edit_post"
             android:textStyle="bold"
             android:textColor="@color/opacwhite"
-            android:textSize="18sp"/>
+            android:textSize="18sp" />
 
         <ImageButton
             android:id="@+id/btnClose"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="@android:color/transparent"
-            android:src="@android:drawable/ic_menu_close_clear_cancel"/>
+            android:src="@drawable/outline_close_24" />
     </LinearLayout>
 
     <EditText
@@ -62,7 +62,17 @@
         android:layout_height="200dp"
         android:layout_marginTop="12dp"
         android:scaleType="centerCrop"
-        android:visibility="gone"
+        android:visibility="gone" />
+
+    <ImageButton
+        android:id="@+id/btnRemoveEditImage"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/outline_close_24"
+        app:tint="@color/darkerGray"
+        android:visibility="visible"
         />
 
     <LinearLayout

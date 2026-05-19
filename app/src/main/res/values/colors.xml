@@ -2,7 +2,7 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="opacwhite">#BFFFFFFF</color>
+    <color name="opacwhite">#80FFFFFF</color>
     <color name="top_blue">#0000FF</color>
     <color name="bottom_blue">#cce6ff</color>
     <color name="bg_gray">#15202B</color>
@@ -13,3 +13,20 @@
     <color name="darkerGray_30">#4D818181</color>
     <color name="red">#E0245E</color>
 </resources>
+
+    <!--    Opacity	Value-->
+    <!--    100%	#FFB0B0B0-->
+    <!--    75%	    #BFB0B0B0-->
+    <!--    50%	    #80B0B0B0-->
+    <!--    25%	    #40B0B0B0-->
+    <!--    0%	    #00B0B0B0-->
+
+    <!--
+    100% = FF
+    75%  = BF
+    50%  = 80
+    25%  = 40
+    10%  = 1A
+    5%   = 0D
+    0%   = 00
+    -->

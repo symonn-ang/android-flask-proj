@@ -141,6 +141,7 @@ class HomePageActivity : AppCompatActivity() {
 
                 val etEdit = view.findViewById<EditText>(R.id.etEditPost)
                 val imgPreview = view.findViewById<ImageView>(R.id.imgPreview)
+                val btnRemoveEditImage = view.findViewById<ImageButton>(R.id.btnRemoveEditImage)
 
                 isEditingPost = true
                 editingImagePreview = imgPreview
@@ -152,6 +153,7 @@ class HomePageActivity : AppCompatActivity() {
                 if (!post.post_image.isNullOrEmpty()) {
 
                     imgPreview.visibility = View.VISIBLE
+                    btnRemoveEditImage.visibility = View.VISIBLE
 
                     Thread {
                         try {
@@ -168,7 +170,22 @@ class HomePageActivity : AppCompatActivity() {
                     }.start()
 
                 } else {
+                    imgPreview.setImageDrawable(null)
                     imgPreview.visibility = View.GONE
+                    btnRemoveEditImage.visibility = View.GONE
+                }
+
+                btnRemoveEditImage.setOnClickListener {
+
+                    pendingEditImageUri = null
+
+                    imgPreview.setImageDrawable(null)
+
+                    imgPreview.visibility = View.GONE
+
+                    btnRemoveEditImage.visibility = View.GONE
+
+                    post.post_image = null
                 }
 
                 view.findViewById<ImageButton>(R.id.btnGallery).setOnClickListener {
@@ -216,10 +233,11 @@ class HomePageActivity : AppCompatActivity() {
 
                         if (success) runOnUiThread {
                             post.post_text = etEdit.text.toString()
-                            if (pendingEditImageUri != null) {
-                                post.post_image = pendingEditImageUri.toString()
-                            }
-                            recyclerPosts.adapter?.notifyItemChanged(position, "edit")
+//                            if (pendingEditImageUri != null) {
+//                                post.post_image = pendingEditImageUri.toString()
+//                            }
+                            loadPosts() // dis instead of vert
+//                            recyclerPosts.adapter?.notifyItemChanged(position, "edit")
                             pendingEditImageUri = null
                             editingImagePreview = null
                             isEditingPost = false
@@ -704,7 +722,10 @@ class HomePageActivity : AppCompatActivity() {
 //    or dis
     private fun openCamera() {
 
-        val imageFile = File(cacheDir, "camera_photo.jpg")
+        val imageFile = File(
+            cacheDir,
+            "camera_photo_${System.currentTimeMillis()}.jpg"
+        )
 
         cameraImageUri = FileProvider.getUriForFile(
             this,
@@ -755,7 +776,8 @@ class HomePageActivity : AppCompatActivity() {
     }
 
     private fun startCrop(uri: Uri, requestCode: Int) {
-        val destUri = Uri.fromFile(File(cacheDir, "cropped_${requestCode}.jpg"))
+        val destFile = File(cacheDir, "cropped_${requestCode}_${System.currentTimeMillis()}.jpg")
+        val destUri = Uri.fromFile(destFile)
 
         UCrop.of(uri, destUri)
             .withAspectRatio(1f, 1f)
@@ -785,9 +807,12 @@ class HomePageActivity : AppCompatActivity() {
                 if (resultUri != null) {
                     selectedPostImageUri = resultUri
                     findViewById<ImageView>(R.id.imgSelected).apply {
+                        setImageDrawable(null)
                         setImageURI(resultUri)
                         visibility = View.VISIBLE
                     }
+                    findViewById<ImageButton>(R.id.btnRemoveImage)
+                        .visibility = View.VISIBLE
                 }
             }
 
